@@ -5,28 +5,8 @@ export default function Home() {
     <>
       <Page>
         <main>
-          <ol>
-            <li>
-              Get started by editing <code>src/pages/index.tsx</code>.
-            </li>
-            <li>Save and see your changes instantly.</li>
-          </ol>
-          <div>
-            <a
-              href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Deploy now
-            </a>
-            <a
-              href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Read our docs
-            </a>
-          </div>
+          <h1>A 2-way peg bridging BTC to Ethereum</h1>
+          <h3>Once bridged, your BTC becomes eBTC, an ERC20 token backed 1:1 by Bitcoin. Your deposit is secured by immutable code, not centralized custodians, and can be redeemed anytime.</h3>
         </main>
       </Page>
     </>

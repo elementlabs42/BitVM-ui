@@ -15,25 +15,29 @@ export function Page({ children }: Props) {
         <PageContent>
           {children}
         </PageContent>
+        <Footer />
       </Container>
-      <Footer />
     </>
   );
 }
 
 const Container = styled.div`
   margin: 0 auto;
-  padding: 0 0 60px 0;
+  padding: 0 5%;
   position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   width: 100%;
   background-color: ${({ theme }) => theme.Background};
 `
 
 const PageContent = styled.div`
+  flex-grow: 1;
+  overflow: auto;
   display: flex;
-  align-items: stretch;
-  justify-content: center;
+  align-items: center;
+  justify-content: left;
   width: 100%;
   padding: 0 20px;
 `
