@@ -18,9 +18,6 @@ export function Navigation() {
 
 const Container = styled.div`
   padding: 0 0 0 20px;
-  display: flex;
-  height: 100%;
-  align-items: center;
   justify-content: right;
 `
 
@@ -32,7 +29,6 @@ const Menu = styled.div`
   > button {
     padding: 0 12px;
     display: flex;
-    align-items: center;
     justify-content: center;
     color: ${({ theme }) => theme.FooterText};
     font-size: 12px;

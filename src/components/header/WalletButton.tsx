@@ -17,7 +17,7 @@ export function WalletButton({ text }: Props) {
 }
 
 const Button = styled.a`
-  margin: 15px 0;
+  margin: 40px 0;
   padding: 0 10px 0 5px;
   display: flex;
   align-items: center;

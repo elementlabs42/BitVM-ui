@@ -13,7 +13,7 @@ export default function ThemeButton() {
 }
 
 const Container = styled.span`
-  margin: 6px 0 0 12px;
+  margin: 2px 0 0 10px;
   cursor: pointer;
 `
 

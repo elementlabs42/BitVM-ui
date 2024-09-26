@@ -14,11 +14,10 @@ export function Footer() {
 }
 
 const Container = styled.div`
-  padding: 0 20px;
+  padding: 20px;
   display: flex;
-  height: 60px;
+  height: 160px;
   width: 100%;
-  align-items: center;
   justify-content: space-between;
   font-size: 12px;
   background-color: ${({ theme }) => theme.Background};
