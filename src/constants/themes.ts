@@ -1,44 +1,28 @@
 export const Colors = {
-  Red: '#ff3b3b',
-  DarkRed: '#ff3737',
-
-  LightGreen: '#00e880',
-  DarkGreen: '#46C681',
-  LightBlue: '#31CDD7',
-
-  LightestGray: '#E5E5E5',
-  LightGray: '#8D8D8D',
-  Gray: '#565656',
-  DarkGray: '#3B3B3B',
-  DarkestGray: 'rgba(37, 38, 45, 0.6)',
-
   Black: '#000',
   White: '#FFFFFF',
 
-  Blue: '#7383FF',
-  Yellow: '#FFD234',
+  DarkBlue: '#0C368E',
 }
 
 export const LightTheme = {
   Text: Colors.Black,
   Background: Colors.White,
 
+  Hover: Colors.DarkBlue,
+
   ButtonText: Colors.White,
-  ButtonBackground: Colors.Blue,
+  ButtonBackground: Colors.DarkBlue,
 }
 
 export const DarkTheme = {
   Text: Colors.White,
   Background: Colors.Black,
 
-  ButtonText: Colors.White,
-  ButtonBackground: Colors.Blue,
-}
+  Hover: Colors.DarkBlue,
 
-export const Fonts = {
-  Header: 'Source Sans Pro, Arial, Helvetica, sans-serif',
-  Monospace: '"Roboto Mono", monospace',
-  Body: 'Open Sans',
+  ButtonText: Colors.White,
+  ButtonBackground: Colors.DarkBlue,
 }
 
 export const FontWeights = {
@@ -49,8 +33,5 @@ export const FontWeights = {
 }
 
 export const Borders = {
-  TextAreaRadius: '5px',
-  TagRadius: '10px',
-  Radius: '10px',
-  TopBarRadius: '20px',
+  ButtonRadius: '6px',
 }

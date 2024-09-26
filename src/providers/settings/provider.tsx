@@ -16,5 +16,5 @@ export function SettingsProvider({ children }: Props) {
 
   const restoreDefaults = () => setSettings(DEFAULT_SETTINGS)
 
-  return <SettingsContext.Provider value={{ settings, setSettings, restoreDefaults }} children={children} />
+  return <SettingsContext.Provider value={{ settings, setSettings, restoreDefaults }}>{children}</SettingsContext.Provider>
 }

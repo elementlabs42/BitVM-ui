@@ -1,6 +1,7 @@
+import { Settings } from '@/providers/settings/context'
 import { useEffect, useRef, useState } from 'react'
 
-function getItem(key: string, init: any) {
+function getItem(key: string, init: Settings) {
   try {
     const item = window.localStorage.getItem(key)
     let result
@@ -12,12 +13,12 @@ function getItem(key: string, init: any) {
       }
     }    
     return result
-  } catch (error) {
+  } catch {
     return init
   }
 }
 
-function setItem(key: string, value: any) {
+function setItem(key: string, value: Settings) {
   if (value === undefined) {
     window.localStorage.removeItem(key)
   } else {
@@ -27,7 +28,7 @@ function setItem(key: string, value: any) {
   }
 }
 
-export function useLocalStorage(key: string, inititalValue: any) {
+export function useLocalStorage(key: string, inititalValue: Settings) {
   const isMounted = useRef(false)
   const [value, setValue] = useState(() => getItem(key, inititalValue))
 
@@ -36,7 +37,7 @@ export function useLocalStorage(key: string, inititalValue: any) {
     return () => {
       isMounted.current = false
     }
-  }, [key])
+  }, [inititalValue, key])
 
   useEffect(() => {
     if (isMounted.current) {

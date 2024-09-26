@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import ThemeButton from './ThemeButton';
+import ThemeButton from './footer/ThemeButton';
 
 export function Footer() {
   return (
