@@ -1,15 +1,19 @@
 import { ReactNode } from 'react'
-import styled from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { useTheme } from '@/hooks/useTheme';
+import { GlobalStyle } from '@/providers/GlobalStyle';
 
 interface Props {
   children: ReactNode
 }
 
 export function Page({ children }: Props) {
+  const { theme } = useTheme()
   return (
-    <>
+    <ThemeProvider theme={theme}>
+      <GlobalStyle />
       <Container>
         <Header />
         <PageContent>
@@ -17,7 +21,7 @@ export function Page({ children }: Props) {
         </PageContent>
         <Footer />
       </Container>
-    </>
+    </ThemeProvider>
   );
 }
 

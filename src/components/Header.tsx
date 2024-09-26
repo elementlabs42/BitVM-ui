@@ -1,9 +1,13 @@
 import styled from 'styled-components'
+import { Logo } from './logo/Logo'
+import { WalletIcon } from './wallet/Icon';
 
 export function Header() {
   return (
     <Container>
+      <Logo />
       <h1>Header</h1>
+      <WalletIcon text="113u7...e3ejT" />
     </Container>
   );
 }
@@ -15,5 +19,5 @@ const Container = styled.div`
   width: 100%;
   justify-content: space-between;
   font-size: 12px;
-  background-color: ${({ theme }) => theme.BannerTextColor};
+  background-color: ${({ theme }) => theme.Background};
 `
