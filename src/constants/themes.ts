@@ -2,6 +2,12 @@ export const Colors = {
   Black: '#000',
   White: '#FFFFFF',
 
+  LightestGray: '#E5E5E5',
+  LightGray: '#8D8D8D',
+  Gray: '#565656',
+  DarkGray: '#3B3B3B',
+  DarkestGray: 'rgba(37, 38, 45, 0.6)',
+
   DarkBlue: '#0C368E',
 }
 
@@ -13,6 +19,8 @@ export const LightTheme = {
 
   ButtonText: Colors.White,
   ButtonBackground: Colors.DarkBlue,
+
+  FooterText: Colors.LightGray,
 }
 
 export const DarkTheme = {
@@ -23,6 +31,8 @@ export const DarkTheme = {
 
   ButtonText: Colors.White,
   ButtonBackground: Colors.DarkBlue,
+
+  FooterText: Colors.Gray,
 }
 
 export const FontWeights = {

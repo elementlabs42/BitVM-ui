@@ -7,15 +7,14 @@ export default function ThemeButton() {
 
   return (
     <Container onClick={toggleTheme}>
-      {useLightTheme ? <MoonIcon color="black" /> : <SunIcon color="gray" />}
+      {useLightTheme ? <MoonIcon color="gray" size={12} /> : <SunIcon color="gray" size={12} />}
     </Container>
   )
 }
 
-const Container = styled.div`
-  height: 20px;
-  width: 20px;
-  font-size: 12px;
+const Container = styled.span`
+  margin: 6px 0 0 12px;
+  cursor: pointer;
 `
 
 const SunIcon = styled(TbSunFilled)`
