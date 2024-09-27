@@ -5,21 +5,29 @@ import styled from 'styled-components'
 
 interface Props {
   text: string
+  className?: string
 }
 
-export function WalletButton({ text }: Props) {
+export function WalletButton({ text, className }: Props) {
   return (
-    <Button href="/">
-      <DotIcon />
-      {text}
-    </Button>
+    <Container className={className}>
+      <Button>
+        <DotIcon />
+        {text}
+      </Button>
+    </Container>
   )
 }
 
-const Button = styled.a`
-  margin: 40px 0;
-  padding: 0 10px 0 5px;
+const Container = styled.div`
   display: flex;
+`
+
+const Button = styled.span`
+  height: 30px;
+  padding: 10px 10px 10px 5px;
+  display: flex;
+  align-self: center;
   align-items: center;
   color: ${({ theme }) => theme.ButtonText};
   text-decoration: none;
@@ -27,6 +35,7 @@ const Button = styled.a`
   font-weight: ${FontWeights.Semibold};
   background-color: ${({ theme }) => theme.ButtonBackground};
   border-radius: ${Borders.ButtonRadius};
+  cursor: pointer;
 `
 
 const DotIcon = styled(PiDotFill)`

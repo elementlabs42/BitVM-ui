@@ -6,16 +6,19 @@ export function Header() {
   return (
     <Container>
       <Navigation />
-      <WalletButton text="113u7...e3ejT | 199 BTC" />
+      <Wallet text="113u7...e3ejT | 199 BTC" />
     </Container>
   );
 }
 
 const Container = styled.div`
-  padding: 0 20px;
   display: flex;
-  height: 120px;
+  height: 15vh;
   width: 100%;
   justify-content: space-between;
   background-color: ${({ theme }) => theme.Background};
+`
+
+const Wallet = styled(WalletButton)`
+  margin-right: 2vw;
 `

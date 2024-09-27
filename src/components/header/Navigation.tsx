@@ -11,7 +11,7 @@ export function Navigation() {
     <Container>
       <Logo textColor={theme.Text} />
       <Menu>
-        <Link href="/bridge">Bridge</Link>
+        <Link href="/">Bridge</Link>
         <Link href="/history">History</Link>
         <Link href="/">Operator</Link>
         <Link href="/">Docs</Link>
@@ -21,7 +21,6 @@ export function Navigation() {
 }
 
 const Container = styled.div`
-  padding: 0 20px;
   display: flex;
   height: 100%;
   align-items: center;
@@ -29,13 +28,13 @@ const Container = styled.div`
 `
 
 const Menu = styled.div`
-  margin-left: 20px;
+  margin-left: 1vw;
   display: flex;
   justify-content: center;
 
   > a,
   > button {
-    padding: 0 12px;
+    padding: 0 1vw;
     display: flex;
     align-items: center;
     justify-content: center;

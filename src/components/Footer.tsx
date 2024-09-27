@@ -14,9 +14,9 @@ export function Footer() {
 }
 
 const Container = styled.div`
-  padding: 20px;
+  margin-top: 20px;
   display: flex;
-  height: 160px;
+  height: 10vh;
   width: 100%;
   justify-content: space-between;
   font-size: 12px;
@@ -24,7 +24,7 @@ const Container = styled.div`
 `
 
 const Spliter = styled.hr`
-  margin: 0 20px;
+  margin: 0;
   height: 1px;
   background-color: ${({ theme }) => theme.FooterText};
   border-top: 1px solid ${({ theme }) => theme.FooterText};

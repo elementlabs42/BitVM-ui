@@ -27,7 +27,7 @@ export function Page({ children }: Props) {
 
 const Container = styled.div`
   margin: 0 auto;
-  padding: 0 5%;
+  padding: 0 10vw;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -37,11 +37,11 @@ const Container = styled.div`
 `
 
 const PageContent = styled.div`
+  padding: 0 5vw;
   flex-grow: 1;
   overflow: auto;
   display: flex;
   align-items: center;
   justify-content: left;
   width: 100%;
-  padding: 0 20px;
 `
