@@ -1,17 +1,20 @@
 import { Borders, FontWeights } from '@/constants/themes'
 import React from 'react'
-import { PiDotFill } from 'react-icons/pi'
 import styled from 'styled-components'
+import { Roboto_Mono } from 'next/font/google'
+import { Dot } from '../icons'
 
 interface Props {
   text: string
   className?: string
 }
 
+const mono = Roboto_Mono({ subsets: ['latin'] })
+
 export function WalletButton({ text, className }: Props) {
   return (
     <Container className={className}>
-      <Button>
+      <Button className={mono.className}>
         <DotIcon />
         {text}
       </Button>
@@ -38,7 +41,7 @@ const Button = styled.span`
   cursor: pointer;
 `
 
-const DotIcon = styled(PiDotFill)`
+const DotIcon = styled(Dot)`
   margin-right: 6px;
   font-size: 20px;
 `
