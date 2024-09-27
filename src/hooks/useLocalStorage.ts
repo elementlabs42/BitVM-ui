@@ -11,7 +11,7 @@ function getItem(key: string, init: Settings) {
       } catch {
         // do nothing
       }
-    }    
+    }
     return result
   } catch {
     return init

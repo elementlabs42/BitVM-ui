@@ -6,9 +6,5 @@ interface Props {
 }
 
 export function Providers(props: Props) {
-  return (
-    <SettingsProvider>
-      {props.children}
-    </SettingsProvider>
-  )
+  return <SettingsProvider>{props.children}</SettingsProvider>
 }

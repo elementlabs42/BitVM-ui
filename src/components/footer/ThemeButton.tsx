@@ -1,6 +1,6 @@
-import styled from "styled-components"
-import { useTheme } from "@/hooks/useTheme"
-import { TbMoonFilled, TbSunFilled } from "react-icons/tb"
+import styled from 'styled-components'
+import { useTheme } from '@/hooks/useTheme'
+import { TbMoonFilled, TbSunFilled } from 'react-icons/tb'
 
 export default function ThemeButton() {
   const { useLightTheme, toggleTheme } = useTheme()
@@ -17,8 +17,6 @@ const Container = styled.span`
   cursor: pointer;
 `
 
-const SunIcon = styled(TbSunFilled)`
-`
+const SunIcon = styled(TbSunFilled)``
 
-const MoonIcon = styled(TbMoonFilled)`
-`
+const MoonIcon = styled(TbMoonFilled)``

@@ -1,4 +1,4 @@
-import { Page } from "@/components/Page";
+import { Page } from '@/components/Page'
 
 export default function History() {
   return (
@@ -7,5 +7,5 @@ export default function History() {
         <h1>History</h1>
       </main>
     </Page>
-  );
+  )
 }

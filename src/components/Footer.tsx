@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Navigation } from './footer/Navigation';
+import { Navigation } from './footer/Navigation'
 
 export function Footer() {
   return (
@@ -10,7 +10,7 @@ export function Footer() {
         <Navigation />
       </Container>
     </>
-  );
+  )
 }
 
 const Container = styled.div`

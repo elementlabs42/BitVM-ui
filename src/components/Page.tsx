@@ -1,9 +1,9 @@
 import { ReactNode } from 'react'
 import styled, { ThemeProvider } from 'styled-components'
-import { Header } from './Header';
-import { Footer } from './Footer';
-import { useTheme } from '@/hooks/useTheme';
-import { GlobalStyle } from '@/providers/GlobalStyle';
+import { Header } from './Header'
+import { Footer } from './Footer'
+import { useTheme } from '@/hooks/useTheme'
+import { GlobalStyle } from '@/providers/GlobalStyle'
 
 interface Props {
   children: ReactNode
@@ -16,13 +16,11 @@ export function Page({ children }: Props) {
       <GlobalStyle />
       <Container>
         <Header />
-        <PageContent>
-          {children}
-        </PageContent>
+        <PageContent>{children}</PageContent>
         <Footer />
       </Container>
     </ThemeProvider>
-  );
+  )
 }
 
 const Container = styled.div`

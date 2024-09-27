@@ -14,7 +14,11 @@ export const SettingsContext = createContext<{
   settings: Settings
   setSettings: (settings: Settings) => void
   restoreDefaults: () => void
-}>({ settings: DEFAULT_SETTINGS, setSettings: () => { }, restoreDefaults: () => { } })
+}>({
+  settings: DEFAULT_SETTINGS,
+  setSettings: () => {},
+  restoreDefaults: () => {},
+})
 
 export function useSettings() {
   return useContext(SettingsContext)
