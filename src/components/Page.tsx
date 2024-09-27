@@ -31,15 +31,11 @@ const Container = styled.div`
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  background-color: ${({ theme }) => theme.Background};
 `
 
 const PageContent = styled.div`
-  padding: 0 5vw;
   flex-grow: 1;
-  overflow: auto;
-  display: flex;
+  overflow: visible;
   align-items: center;
   justify-content: left;
-  width: 100%;
 `

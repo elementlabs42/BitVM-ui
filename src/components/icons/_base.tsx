@@ -10,6 +10,10 @@ interface Props {
   children?: ReactNode
 }
 
+export interface IconProps {
+  className?: string
+}
+
 export function SvgIcon({ className, viewBox, fill, stroke, strokeWidth, children }: Props) {
   return (
     <Svg

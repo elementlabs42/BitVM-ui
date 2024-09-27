@@ -1,10 +1,6 @@
-import { SvgIcon } from './_base'
+import { IconProps, SvgIcon } from './_base'
 
-interface Props {
-  className?: string
-}
-
-export function Sun({ className }: Props) {
+export function Sun({ className }: IconProps) {
   return (
     <SvgIcon className={className} viewBox="0 0 24 24">
       <path d="M12 19a1 1 0 0 1 .993 .883l.007 .117v1a1 1 0 0 1 -1.993 .117l-.007 -.117v-1a1 1 0 0 1 1 -1z"></path>

@@ -21,6 +21,9 @@ export const LightTheme = {
   ButtonBackground: Colors.DarkBlue,
 
   FooterText: Colors.LightGray,
+
+  ShadowInner: 'rgba(16, 24, 40, 0.08)',
+  ShadowOuter: 'rgba(16, 24, 40, 0.03)',
 }
 
 export const DarkTheme = {
@@ -33,6 +36,9 @@ export const DarkTheme = {
   ButtonBackground: Colors.DarkBlue,
 
   FooterText: Colors.Gray,
+
+  ShadowInner: 'rgba(229, 229, 229, 0.08)',
+  ShadowOuter: 'rgba(229, 229, 229, 0.03)',
 }
 
 export const FontWeights = {
@@ -44,4 +50,5 @@ export const FontWeights = {
 
 export const Borders = {
   ButtonRadius: '6px',
+  IconRadius: '8px',
 }
