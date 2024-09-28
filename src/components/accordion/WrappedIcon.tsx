@@ -24,7 +24,7 @@ const Container = styled.div.attrs<{ relativeSize: number }>((props) => ({
   height: ${(props) => props.relativeSize * 1.6}em;
   width: ${(props) => props.relativeSize * 1.6}em;
   border-radius: ${Borders.IconRadius};
-  margin-right: 10px;
+  margin-right: 0.6em;
   display: flex;
   align-items: center;
   justify-content: center;
