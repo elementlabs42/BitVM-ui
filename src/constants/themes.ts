@@ -51,4 +51,5 @@ export const FontWeights = {
 export const Borders = {
   ButtonRadius: '6px',
   IconRadius: '8px',
+  PanelRadius: '12px',
 }

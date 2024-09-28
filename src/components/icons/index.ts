@@ -1,3 +1,5 @@
 export * from './Moon'
 export * from './Sun'
 export * from './Dot'
+export * from './Chevron'
+export * from './Refresh'
