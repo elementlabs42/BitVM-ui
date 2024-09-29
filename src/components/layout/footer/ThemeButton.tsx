@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { useTheme } from '@/hooks/useTheme'
-import { Sun, Moon } from '../icons'
+import { Sun, Moon } from '../../icons'
 
 export default function ThemeButton() {
   const { useLightTheme, toggleTheme } = useTheme()

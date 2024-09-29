@@ -1,7 +1,7 @@
 import { ReactElement } from 'react'
 import styled from 'styled-components'
 import { IconProps } from '../icons/_base'
-import WrappedIcon from './WrappedIcon'
+import { WrappedIcon } from './WrappedIcon'
 
 interface Props {
   children: ReactElement[]
@@ -9,7 +9,7 @@ interface Props {
   className?: string
 }
 
-export default function ContentWithIcon({ children, icon, className }: Props) {
+export function ContentWithIcon({ children, icon, className }: Props) {
   return (
     <Container className={className}>
       <WrappedIcon icon={icon} size={children.length} />

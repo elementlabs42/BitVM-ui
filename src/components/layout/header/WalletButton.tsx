@@ -2,7 +2,7 @@ import { Borders, FontWeights } from '@/constants/themes'
 import React from 'react'
 import styled from 'styled-components'
 import { Roboto_Mono } from 'next/font/google'
-import { Dot } from '../icons'
+import { Dot } from '../../icons'
 
 interface Props {
   text: string

@@ -2,7 +2,7 @@ export const Colors = {
   Black: '#000',
   White: '#FFFFFF',
 
-  LightestGray: '#E5E5E5',
+  LightestGray: '#F9FAFB',
   LightGray: '#8D8D8D',
   Gray: '#565656',
   DarkGray: '#3B3B3B',
@@ -16,6 +16,7 @@ export const LightTheme = {
   Background: Colors.White,
 
   Hover: Colors.DarkBlue,
+  HoverArea: Colors.LightestGray,
 
   ButtonText: Colors.White,
   ButtonBackground: Colors.DarkBlue,
@@ -24,6 +25,9 @@ export const LightTheme = {
 
   ShadowInner: 'rgba(16, 24, 40, 0.08)',
   ShadowOuter: 'rgba(16, 24, 40, 0.03)',
+
+  AccordionDetailBorder: '#E4E7EC',
+  AccordionDetailBackground: Colors.LightestGray,
 }
 
 export const DarkTheme = {
@@ -31,6 +35,7 @@ export const DarkTheme = {
   Background: Colors.Black,
 
   Hover: Colors.DarkBlue,
+  HoverArea: Colors.DarkestGray,
 
   ButtonText: Colors.White,
   ButtonBackground: Colors.DarkBlue,
@@ -39,6 +44,9 @@ export const DarkTheme = {
 
   ShadowInner: 'rgba(229, 229, 229, 0.08)',
   ShadowOuter: 'rgba(229, 229, 229, 0.03)',
+
+  AccordionDetailBorder: Colors.Gray,
+  AccordionDetailBackground: Colors.DarkestGray,
 }
 
 export const FontWeights = {
