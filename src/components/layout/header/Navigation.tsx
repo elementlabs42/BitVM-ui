@@ -11,7 +11,7 @@ export function Navigation() {
     <Container>
       <Logo textColor={theme.Text} />
       <Menu>
-        <Link href="/">Bridge</Link>
+        <Link href="/bridge">Bridge</Link>
         <Link href="/history">History</Link>
         <Link href="/">Operator</Link>
         <Link href="/">Docs</Link>
@@ -28,18 +28,18 @@ const Container = styled.div`
 `
 
 const Menu = styled.div`
-  margin-left: 1vw;
+  margin-left: 1.5rem;
   display: flex;
   justify-content: center;
 
   > a,
   > button {
-    padding: 0 1vw;
+    padding: 0 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: ${({ theme }) => theme.Text};
-    font-size: 16px;
+    color: ${({ theme }) => theme.NavigationText};
+    font-size: 1rem;
     font-weight: ${FontWeights.Semibold};
     text-decoration: none;
 

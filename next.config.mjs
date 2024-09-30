@@ -4,6 +4,14 @@ const nextConfig = {
   output: 'standalone',
   compiler: {
     styledComponents: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/bridge",
+        destination: "/"
+      }
+    ]
   }
 };
 

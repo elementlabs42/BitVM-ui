@@ -9,9 +9,25 @@ export const Colors = {
   DarkestGray: 'rgba(37, 38, 45, 0.6)',
 
   DarkBlue: '#0C368E',
+  TextPrimary900: '#101828',
+  TertiaryColor: '#475467',
+  TextSecondary: '#344054',
+  
 }
 
 export const LightTheme = {
+
+  NavigationText: Colors.TertiaryColor,
+  SubTitleText: Colors.TertiaryColor,
+
+  ButtonDarkBg: Colors.DarkBlue,
+  ButtonDarkText: Colors.White,
+
+  ButtonLightBg: Colors.White,
+  ButtonLightText: Colors.Black,
+
+  PrimaryText: Colors.TextPrimary900,
+  SecondaryText: Colors.TextSecondary,
   Text: Colors.Black,
   Background: Colors.White,
 
@@ -31,6 +47,20 @@ export const LightTheme = {
 }
 
 export const DarkTheme = {
+  NavigationText: Colors.TertiaryColor,
+  SubTitleText: Colors.TertiaryColor,
+
+  ButtonDarkBg: Colors.DarkBlue,
+  ButtonDarkText: Colors.White,
+
+  ButtonBorderColor: "#D0D5DD",
+
+  ButtonLightBg: Colors.White,
+  ButtonLightText: Colors.Black,
+
+  PrimaryText: Colors.TextPrimary900,
+  SecondaryText: Colors.TextSecondary,
+ 
   Text: Colors.White,
   Background: Colors.Black,
 
