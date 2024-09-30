@@ -1,22 +1,167 @@
-import { Accordion, ContentWithIcon } from '@/components/controls'
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Refresh } from '@/components/icons'
-import { Active, Archived, PegIn, PegOut, Signed, TimedOut } from '@/components/icons/history'
+import { Accordion, ContentWithIcon, ContentWithIconAndAction, PaginationPanel } from '@/components/controls'
+import { Refresh } from '@/components/icons'
+import { Checked, PegIn, PegOut } from '@/components/icons/history'
 import { Page } from '@/components/layout'
-import { Borders } from '@/constants/themes'
 import styled from 'styled-components'
 
 export default function History() {
+  const data = [
+    {
+      type: 'in',
+      receipient: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      amount: 2,
+      status: 'Pending',
+      txns: [
+        {
+          hash: '0x8d62bf13ccfc8b7e66abb94d44ac53977c890395bc6d9621674a64e91a2934a5',
+          status: 'Signed',
+        },
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Waiting for operators. Time remained: 2 Weeks 5 Days 10 Hours 38 Minutes 24 Seconds',
+        },
+      ],
+    },
+    {
+      type: 'out',
+      receipient: 'tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v',
+      amount: 2,
+      status: 'Pending',
+      txns: [
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Archived',
+        },
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Mined',
+        },
+        {
+          hash: 'N/A',
+          status: 'Waiting for operators.',
+        },
+      ],
+    },
+    {
+      type: 'in',
+      receipient: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      amount: 2,
+      status: 'Pending',
+      txns: [
+        {
+          hash: '0x8d62bf13ccfc8b7e66abb94d44ac53977c890395bc6d9621674a64e91a2934a5',
+          status: 'Signed',
+        },
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Waiting for operators. Time remained: 2 Weeks 5 Days 10 Hours 38 Minutes 24 Seconds',
+        },
+      ],
+    },
+    {
+      type: 'in',
+      receipient: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
+      amount: 2,
+      status: 'Pending',
+      txns: [
+        {
+          hash: '0x8d62bf13ccfc8b7e66abb94d44ac53977c890395bc6d9621674a64e91a2934a5',
+          status: 'Signed',
+        },
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Waiting for operators. Time remained: 2 Weeks 5 Days 10 Hours 38 Minutes 24 Seconds',
+        },
+      ],
+    },
+    {
+      type: 'out',
+      receipient: 'tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v',
+      amount: 2,
+      status: 'Pending',
+      txns: [
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Archived',
+        },
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Mined',
+        },
+        {
+          hash: 'N/A',
+          status: 'Waiting for operators.',
+        },
+      ],
+    },
+    {
+      type: 'out',
+      receipient: 'tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v',
+      amount: 2,
+      status: 'Pending',
+      txns: [
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Archived',
+        },
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Mined',
+        },
+        {
+          hash: 'N/A',
+          status: 'Waiting for operators.',
+        },
+      ],
+    },
+    {
+      type: 'out',
+      receipient: 'tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v',
+      amount: 2,
+      status: 'Pending',
+      txns: [
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Archived',
+        },
+        {
+          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
+          status: 'Mined',
+        },
+        {
+          hash: 'N/A',
+          status: 'Waiting for operators.',
+        },
+      ],
+    },
+  ]
   return (
     <Page>
       <main>
         <Title>History</Title>
         <Panel>
-          <Accordion>
+          {data.map((d, i) => (
+            <Accordion key={i}>
+              <Graph icon={d.type === 'in' ? <PegIn /> : <PegOut />}>
+                <span>
+                  {d.type === 'in' ? `Bridge ${d.amount} BTC` : `Redeem ${d.amount} eBTC`} to {d.receipient}
+                </span>
+                <span>{d.status}</span>
+              </Graph>
+              {d.txns.map((t, j) => (
+                <Transaction key={j} icon={<Checked />} actionIcon={<Refresh />} onAction={() => {}}>
+                  <span>transaction: {t.hash}</span>
+                  <span>{t.status}</span>
+                </Transaction>
+              ))}
+            </Accordion>
+          ))}
+          {/* <Accordion>
             <Graph icon={<PegOut />}>
-              <span>Brdige 1 BTC to 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</span>
+              <span>Redeem 2 eBTC to tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v</span>
               <span>Pending</span>
             </Graph>
-            <Transaction icon={<Signed />}>
+            <Transaction icon={<Signed />} actionIcon={<Refresh />} onAction={() => {}}>
               <span>Ethereum transaction: 0x8d62bf13ccfc8b7e66abb94d44ac53977c890395bc6d9621674a64e91a2934a5</span>
               <span>Signed</span>
             </Transaction>
@@ -26,10 +171,18 @@ export default function History() {
             </Transaction>
           </Accordion>
           <Accordion>
-            <Graph icon={<Active />}>
-              <span>Brdige 1 BTC to 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</span>
+            <Graph icon={<PegOut />}>
+              <span>Redeem 2 eBTC to tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v</span>
               <span>Pending</span>
             </Graph>
+            <Transaction icon={<Checked />} actionIcon={<Refresh />} onAction={() => {}}>
+              <span>Ethereum transaction: 0x8d62bf13ccfc8b7e66abb94d44ac53977c890395bc6d9621674a64e91a2934a5</span>
+              <span>Mined</span>
+            </Transaction>
+            <Transaction icon={<Active />}>
+              <span>Peg-out transaction: eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b</span>
+              <span>Waiting for operators. Time remained: 2 Weeks 5 Days 10 Hours 38 Minutes 24 Seconds</span>
+            </Transaction>
           </Accordion>
           <Accordion>
             <Graph icon={<PegIn />}>
@@ -61,37 +214,7 @@ export default function History() {
               <span>Brdige 1 BTC to 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</span>
               <span>Pending</span>
             </Graph>
-          </Accordion>
-          <Accordion>
-            <Graph icon={<ChevronUp />}>
-              <span>Brdige 1 BTC to 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</span>
-              <span>Pending</span>
-            </Graph>
-          </Accordion>
-          <Accordion>
-            <Graph icon={<ChevronRight />}>
-              <span>Brdige 1 BTC to 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</span>
-              <span>Pending</span>
-            </Graph>
-          </Accordion>
-          <Accordion>
-            <Graph icon={<ChevronDown />}>
-              <span>Brdige 1 BTC to 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</span>
-              <span>Pending</span>
-            </Graph>
-          </Accordion>
-          <Accordion>
-            <Graph icon={<ChevronLeft />}>
-              <span>Brdige 1 BTC to 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</span>
-              <span>Pending</span>
-            </Graph>
-          </Accordion>
-          <Accordion>
-            <Graph icon={<Refresh />}>
-              <span>Brdige 1 BTC to 0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</span>
-              <span>Pending</span>
-            </Graph>
-          </Accordion>
+          </Accordion> */}
         </Panel>
       </main>
     </Page>
@@ -103,23 +226,16 @@ const Title = styled.h1`
   padding: 0 1vw;
 `
 
-const Panel = styled.div`
+const Panel = styled(PaginationPanel)`
   margin: 3vh 0;
   padding: 1vh 2vw 1.6vw 2vw;
-  display: flex;
-  flex-direction: column;
   min-height: 60vh;
-  background-color: ${({ theme }) => theme.Background};
-  border-radius: ${Borders.PanelRadius};
-  box-shadow:
-    0px 20px 24px -4px ${({ theme }) => theme.ShadowInner},
-    0px 8px 8px -4px ${({ theme }) => theme.ShadowOuter};
 `
 
 const Graph = styled(ContentWithIcon)``
 
-const Transaction = styled(ContentWithIcon)``
+const Transaction = styled(ContentWithIconAndAction)``
 
-const GraphSized = styled(Graph)`
-  font-size: 30px;
-`
+// const GraphSized = styled(Graph)`
+//   font-size: 30px;
+// `

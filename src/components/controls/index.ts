@@ -1,3 +1,5 @@
 export * from './Accordion'
 export * from './ContentWithIcon'
-export * from './WrappedIcon'
+export * from './RoundedIcon'
+export * from './PaginationPanel'
+export * from './Pagination'
