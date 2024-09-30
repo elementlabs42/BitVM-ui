@@ -139,7 +139,7 @@ export default function History() {
     <Page>
       <main>
         <Title>History</Title>
-        <Panel>
+        <PaginationPanel>
           {data.map((d, i) => (
             <Accordion key={i}>
               <Graph icon={d.type === 'in' ? <PegIn /> : <PegOut />}>
@@ -215,7 +215,7 @@ export default function History() {
               <span>Pending</span>
             </Graph>
           </Accordion> */}
-        </Panel>
+        </PaginationPanel>
       </main>
     </Page>
   )
@@ -224,12 +224,6 @@ export default function History() {
 const Title = styled.h1`
   margin: 0;
   padding: 0 1vw;
-`
-
-const Panel = styled(PaginationPanel)`
-  margin: 3vh 0;
-  padding: 1vh 2vw 1.6vw 2vw;
-  min-height: 60vh;
 `
 
 const Graph = styled(ContentWithIcon)``

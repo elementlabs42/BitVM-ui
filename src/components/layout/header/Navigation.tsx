@@ -2,16 +2,14 @@ import { FontWeights } from '@/constants/themes'
 import Link from 'next/link'
 import React from 'react'
 import styled from 'styled-components'
-import { Logo } from './Logo'
-import { useTheme } from '@/hooks/useTheme'
+import { LinkedLogo } from './LinkedLogo'
 
 export function Navigation() {
-  const { theme } = useTheme()
   return (
     <Container>
-      <Logo textColor={theme.Text} />
+      <LinkedLogo href="/" />
       <Menu>
-        <Link href="/">Bridge</Link>
+        <Link href="/bridge">Bridge</Link>
         <Link href="/history">History</Link>
         <Link href="/">Operator</Link>
         <Link href="/">Docs</Link>
@@ -22,7 +20,6 @@ export function Navigation() {
 
 const Container = styled.div`
   display: flex;
-  height: 100%;
   align-items: center;
   justify-content: left;
 `
