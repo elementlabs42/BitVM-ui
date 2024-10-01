@@ -1,7 +1,7 @@
 import { ReactElement } from 'react'
 import styled from 'styled-components'
 import { IconProps } from '../icons/_base'
-import { RoundedIcon } from './RoundedIcon'
+import { RoundedIcon } from './Rounded'
 
 interface Props {
   children: ReactElement[]

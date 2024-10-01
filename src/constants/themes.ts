@@ -2,6 +2,8 @@ export const Colors = {
   Black: '#000',
   White: '#FFFFFF',
 
+  Red: '#D92D20',
+
   LightestGray: '#F9FAFB',
   LightGray: '#8D8D8D',
   Gray: '#565656',
@@ -13,6 +15,7 @@ export const Colors = {
 
 export const LightTheme = {
   Text: Colors.Black,
+  Warning: Colors.Red,
   Background: Colors.White,
 
   Hover: Colors.DarkBlue,
@@ -32,6 +35,7 @@ export const LightTheme = {
 
 export const DarkTheme = {
   Text: Colors.White,
+  Warning: Colors.Red,
   Background: Colors.Black,
 
   Hover: Colors.DarkBlue,
