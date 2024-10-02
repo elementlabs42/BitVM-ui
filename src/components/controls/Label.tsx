@@ -4,14 +4,15 @@ import { Help } from '../icons'
 
 interface Props {
   text: ReactNode
+  withHelp?: boolean
   className?: string
 }
 
-export function Label({ text, className }: Props) {
+export function Label({ text, withHelp = false, className }: Props) {
   return (
     <Container className={className}>
       {text}
-      <Help />
+      {withHelp && <Help />}
     </Container>
   )
 }

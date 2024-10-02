@@ -35,6 +35,7 @@ export function Pagination({ total, current, onPageClick, className }: Props) {
 const Container = styled.div`
   display: flex;
   flex-direction: row;
+  column-gap: 0.5em;
   background-color: ${({ theme }) => theme.Background};
   border-radius: ${Borders.PanelRadius};
 `

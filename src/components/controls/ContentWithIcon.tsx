@@ -26,6 +26,7 @@ export function ContentWithIcon({ children, icon, className }: Props) {
 const Container = styled.div`
   display: flex;
   flex-direction: row;
+  column-gap: 0.6em;
 `
 
 const ContentWrapper = styled.div`
