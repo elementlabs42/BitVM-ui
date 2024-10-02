@@ -1,6 +1,8 @@
 export const Colors = {
   Black: '#000',
+  BlackTransparent: 'rgba(0, 0, 0, 0.6)',
   White: '#FFFFFF',
+  WhiteTransparent: 'rgba(255, 255, 255, 0.6)',
 
   Red: '#D92D20',
 
@@ -17,6 +19,7 @@ export const LightTheme = {
   Text: Colors.Black,
   Warning: Colors.Red,
   Background: Colors.White,
+  BackgroundTransparent: Colors.WhiteTransparent,
 
   Hover: Colors.DarkBlue,
   HoverArea: Colors.LightestGray,
@@ -37,6 +40,7 @@ export const DarkTheme = {
   Text: Colors.White,
   Warning: Colors.Red,
   Background: Colors.Black,
+  BackgroundTransparent: Colors.BlackTransparent,
 
   Hover: Colors.DarkBlue,
   HoverArea: Colors.DarkestGray,

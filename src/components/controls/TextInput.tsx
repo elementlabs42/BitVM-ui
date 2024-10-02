@@ -109,7 +109,7 @@ export function TextInput({
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  row-gap: 0.3em;
+  row-gap: 0.5em;
 `
 
 const InputContainer = styled.div`

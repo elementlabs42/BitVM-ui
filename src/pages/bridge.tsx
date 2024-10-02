@@ -1,7 +1,7 @@
-import { Label, RoundedElement, TextInput, TextInputWithAction, Warning } from '@/components/controls'
-import { Bitcoin } from '@/components/icons'
-import { Page } from '@/components/layout'
-import { Panel } from '@/components/layout/Panel'
+import { Label, RoundedElement, RoundedIcon, TextInput, TextInputWithAction, Warning } from '@/components/controls'
+import { BackgroundPattern } from '@/components/controls'
+import { Bitcoin, Swap } from '@/components/icons'
+import { Page, Panel } from '@/components/layout'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
@@ -18,9 +18,13 @@ export default function Bridge() {
   const warningLabel = <Warning text={'The satoshi equivalent of the number is a power of 2'} withHelp={true} />
   return (
     <Page>
-      <Title>Bridge</Title>
+      <Title>Confirm amount</Title>
       <FormPanelWithButton>
+        <BackgroundPatternStyled />
         <FormPanel>
+          <SwapIcon icon={<Swap />} size={1} />
+          <Subtitle>Bridge</Subtitle>
+          <Supplementary>Supply BTC to send eBTC to your Ethereum wallet</Supplementary>
           <TextInputWithAction
             label={selectLabel}
             validate={(t) => {
@@ -42,6 +46,24 @@ export default function Bridge() {
             }}
             warning={<Warning text={'Incorrect Ethereum address format'} />}
           />
+          <Supplementaries>
+            <Supplementary>
+              <span>Destination chain:</span>
+              <span>Ethereum</span>
+            </Supplementary>
+            <Supplementary>
+              <span>Handling fee:</span>
+              <span>0</span>
+            </Supplementary>
+            <Supplementary>
+              <span>You receive:</span>
+              <span>100 eBTC</span>
+            </Supplementary>
+            <Supplementary>
+              <span>Refund address:</span>
+              <span>tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v</span>
+            </Supplementary>
+          </Supplementaries>
         </FormPanel>
         <Buttons>
           <Button onClick={() => {}}>Back</Button>
@@ -54,9 +76,28 @@ export default function Bridge() {
   )
 }
 
+const BackgroundPatternStyled = styled(BackgroundPattern)`
+  width: 208px;
+  position: absolute;
+  margin: 0;
+  height: 208px;
+  z-index: 0;
+  pointer-events: none;
+`
+
 const Title = styled.h1`
   margin: 0;
   padding: 0 1vw;
+`
+
+const SwapIcon = styled(RoundedIcon)`
+  border-radius: 40%;
+  background-color: ${({ theme }) => theme.Background};
+  box-shadow: 0px 2px 2px 2px ${({ theme }) => theme.ShadowInner};
+`
+
+const Subtitle = styled.h3`
+  margin: 0;
 `
 
 const FormPanel = styled(Panel)`
@@ -64,6 +105,8 @@ const FormPanel = styled(Panel)`
   flex-direction: column;
   row-gap: 1em;
   min-height: 50vh;
+  z-index: 1;
+  background-color: ${({ theme }) => theme.BackgroundTransparent};
 `
 
 const FormPanelWithButton = styled.div`
@@ -82,4 +125,18 @@ const Buttons = styled.div`
 
 const Button = styled(RoundedElement)`
   padding: 1.2em 2em;
+`
+
+const Supplementaries = styled.div`
+  display: flex;
+  flex-direction: column;
+  row-gap: 1em;
+`
+
+const Supplementary = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 0.8em;
+  color: ${({ theme }) => theme.FooterText};
 `
