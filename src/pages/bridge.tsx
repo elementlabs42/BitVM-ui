@@ -1,4 +1,12 @@
-import { Label, RoundedElement, RoundedIcon, TextInput, TextInputWithAction, Warning } from '@/components/controls'
+import {
+  Label,
+  RoundedElement,
+  RoundedIcon,
+  SelectInput,
+  TextInput,
+  TextInputWithAction,
+  Warning,
+} from '@/components/controls'
 import { BackgroundPattern } from '@/components/controls'
 import { Bitcoin, Swap } from '@/components/icons'
 import { Page, Panel } from '@/components/layout'
@@ -25,8 +33,26 @@ export default function Bridge() {
           <SwapIcon icon={<Swap />} size={1} />
           <Subtitle>Bridge</Subtitle>
           <Supplementary>Supply BTC to send eBTC to your Ethereum wallet</Supplementary>
+          <SelectInput
+            label={<Label text={'Select Bitcoin account to bridge'} withHelp={true} />}
+            placeHolder="Select Bitcoin account"
+          >
+            <Account>
+              <AccountName>Legacy</AccountName>
+              <AccountAmount>1.19 BTC</AccountAmount>
+            </Account>
+            <Account>
+              <AccountName>SegWit</AccountName>
+              <AccountAmount>5.32 BTC</AccountAmount>
+            </Account>
+            <Account>
+              <AccountName>Native SegWit</AccountName>
+              <AccountAmount>5.32 BTC</AccountAmount>
+            </Account>
+          </SelectInput>
           <TextInputWithAction
             label={selectLabel}
+            placeHolder="0.0"
             validate={(t) => {
               const result = t === 'aaa'
               setAmountValid(result)
@@ -113,6 +139,18 @@ const FormPanelWithButton = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+`
+
+const Account = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 1em;
+`
+
+const AccountName = styled.div``
+const AccountAmount = styled.div`
+  color: ${({ theme }) => theme.FooterText};
 `
 
 const Buttons = styled.div`

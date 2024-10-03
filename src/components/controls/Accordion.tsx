@@ -15,7 +15,7 @@ export function Accordion({ children, className }: Props) {
   const [summary, ...details] = Children.toArray(children)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const expanderIconRef = useRef<HTMLDivElement>(null)
+  const expanderIconRef = useRef<SVGSVGElement>(null)
 
   const getContentHeight = () => (contentRef.current ? contentRef.current['clientHeight'] : 0)
 
@@ -47,9 +47,7 @@ export function Accordion({ children, className }: Props) {
     <Container className={className}>
       <Expander onClick={toggleDetail}>
         <SummaryContent>{summary}</SummaryContent>
-        <ExpanderIconWrapper ref={expanderIconRef}>
-          <ExpanderIcon />
-        </ExpanderIconWrapper>
+        <ExpanderIcon iconRef={expanderIconRef} />
       </Expander>
       <Details ref={wrapperRef}>
         <DetailsContent ref={contentRef}>{details}</DetailsContent>
@@ -78,14 +76,12 @@ const Expander = styled.div`
   margin-right: 1em;
   cursor: pointer;
 `
-const ExpanderIconWrapper = styled.div`
-  transition: transform 0.2s ease-out;
-`
 
 const ExpanderIcon = styled(ChevronRight)`
   font-size: 1em;
   fill: ${({ theme }) => theme.Background};
   stroke: ${({ theme }) => theme.Text};
+  transition: transform 0.2s ease-out;
 `
 
 const SummaryContent = styled.div``

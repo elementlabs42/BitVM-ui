@@ -1,9 +1,9 @@
 import styled from 'styled-components'
-import { Borders } from '@/constants/themes'
 import { ReactElement, ReactNode, useEffect, useRef, useState } from 'react'
 import { useDebounce } from '@/hooks/useDebounce'
 import { IconProps } from '../icons/_base'
 import { RoundedElement } from './Rounded'
+import { InputContainer, InputIcon, InputStyle, withLabel } from './common'
 
 interface Props {
   label: ReactNode
@@ -93,50 +93,17 @@ export function TextInput({
     }
   }, [debouncedText, validate])
 
-  return (
-    <Container className={className}>
-      <Wrapper>{label}</Wrapper>
-      <InputContainer>
-        {inputIcon && <InputIcon>{inputIcon}</InputIcon>}
-        <Input placeholder={placeHolder} onChange={onChange} ref={inputRef} />
-        {action && action}
-      </InputContainer>
-      {warning && !valid && <Wrapper>{warning}</Wrapper>}
-    </Container>
+  const input = (
+    <InputContainer>
+      {inputIcon && <InputIcon>{inputIcon}</InputIcon>}
+      <Input placeholder={placeHolder} onChange={onChange} ref={inputRef} />
+      {action && action}
+    </InputContainer>
   )
+
+  return withLabel({ label, valid, warning, input, className })
 }
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  row-gap: 0.5em;
-`
-
-const InputContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  overflow: hidden;
-  border: 1px solid ${({ theme }) => theme.FooterText};
-  border-radius: ${Borders.ButtonRadius};
-`
-
-const InputIcon = styled.div`
-  margin-left: 0.5em;
-  display: flex;
-  align-content: center;
-`
-
 const Input = styled.input`
-  flex-grow: 1;
-  font-size: 1.2em;
-  padding: 0.5em;
-  border: 0;
-  &:focus-visible {
-    outline: 0;
-  }
-  color: ${({ theme }) => theme.Text};
-  background-color: ${({ theme }) => theme.Background};
+  ${InputStyle}
 `
-
-const Wrapper = styled.div``

@@ -15,7 +15,7 @@ interface RoundedElementProps extends Props {
   children: ReactNode
 }
 
-interface RoundedIconProps extends Props {
+export interface RoundedIconProps extends Props {
   icon: ReactElement<IconProps>
 }
 
