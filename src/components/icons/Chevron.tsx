@@ -6,7 +6,7 @@ interface BaseChevronProps extends IconProps {
 }
 
 interface ChevronProps extends IconProps {
-  iconRef: RefObject<SVGSVGElement>
+  iconRef?: RefObject<SVGSVGElement>
 }
 
 const Chevron = forwardRef<SVGSVGElement, BaseChevronProps>(({ className, rotate }, ref) => {

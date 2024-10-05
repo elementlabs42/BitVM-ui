@@ -98,7 +98,7 @@ const DetailsContent = styled.div`
   row-gap: 1.6vh;
   justify-content: space-between;
   margin: ${DETAIL_VERTICAL_MARGIN}em 2em ${DETAIL_VERTICAL_MARGIN}em 1em;
-  padding: 1em 1em;
+  padding: 1em;
   border-width: 1px 0 1px 0;
   border-style: solid;
   border-color: ${({ theme }) => theme.AccordionDetailBorder};

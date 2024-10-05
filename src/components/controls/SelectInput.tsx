@@ -1,8 +1,11 @@
 import styled from 'styled-components'
-import { ReactNode, useRef } from 'react'
+import { Children, ReactNode, useEffect, useRef, useState } from 'react'
 import { InputContainer, InputStyle, withLabel } from './common'
-import { RoundedIcon } from '.'
+import { RoundedIcon, Warning } from '.'
 import { ChevronDown } from '../icons'
+import { Borders } from '@/constants/themes'
+import { Hidden } from './Hidden'
+import { Checked } from '../icons/history'
 
 interface Props {
   label: ReactNode
@@ -11,26 +14,111 @@ interface Props {
   className?: string
 }
 
+const FADE_OUT_DURATION = 120
+
 export function SelectInput({ label, placeHolder = '', children, className }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const iconRef = useRef<SVGSVGElement>(null)
+  const items = Children.toArray(children)
+  const itemsRef = useRef<HTMLDivElement[] | null[]>([])
+  const [open, setOpen] = useState(false)
+  const [onceOpened, setOnceOpened] = useState(false)
+  const [selectedKey, setSelectedKey] = useState<string | null>()
+  const [selected, setSelected] = useState<Element | null>(null)
+
+  const toggleSelect = () => {
+    if (!open) {
+      openSelect()
+    } else {
+      closeSelect()
+    }
+  }
+
+  const onSelect = (e: React.MouseEvent) => {
+    setSelectedKey(e.currentTarget.getAttribute('data-key'))
+    closeSelect()
+  }
+
+  const openSelect = () => {
+    const node = wrapperRef.current
+    const icon = iconRef.current
+    if (node && icon) {
+      node.style['opacity'] = '1'
+      node.style['transform'] = 'scale(1)'
+      icon.style['transform'] = 'rotate(180deg)'
+      setOpen(true)
+      setTimeout(() => {
+        node.style['transform'] = 'none'
+      })
+    }
+  }
+
+  const closeSelect = () => {
+    const node = wrapperRef.current
+    const icon = iconRef.current
+    if (node && icon) {
+      node.style['opacity'] = '0'
+      icon.style['transform'] = 'rotate(0deg)'
+      setOpen(false)
+      setTimeout(() => {
+        node.style['transform'] = 'scale(0)'
+        setOnceOpened(true)
+      }, FADE_OUT_DURATION)
+    }
+  }
+
+  useEffect(() => {
+    const itemRef = itemsRef.current.find((el) => el?.getAttribute('data-key') === selectedKey)
+    if (itemRef) {
+      setSelected(itemRef.children.item(0))
+    }
+  }, [selectedKey])
+
+  const select = selected ? (
+    <Select dangerouslySetInnerHTML={{ __html: selected.outerHTML }} />
+  ) : (
+    <Select>{placeHolder != '' && <PlaceHolder>{placeHolder}</PlaceHolder>}</Select>
+  )
 
   const input = (
     <Container>
-      <SelectContainer className={className}>
-        <Select>{placeHolder != '' && <PlaceHolder>{placeHolder}</PlaceHolder>}</Select>
-        <Icon icon={<ChevronDown iconRef={iconRef} />} noBorder={true} size={1} />
+      <SelectContainer className={className} onClick={toggleSelect}>
+        {select}
+        <Icon icon={<IconSvg iconRef={iconRef} />} noBorder={true} size={1} />
       </SelectContainer>
       <Items ref={wrapperRef}>
-        <ItemContent ref={contentRef}>{children}</ItemContent>
+        {open && <Hidden onClick={toggleSelect} />}
+        <ItemContent ref={contentRef}>
+          {items.map((item, i) => (
+            <Item
+              key={i}
+              data-key={i.toString()}
+              onClick={onSelect}
+              ref={(el) => {
+                itemsRef.current[i] = el
+              }}
+            >
+              {item}
+              {selectedKey === i.toString() && <Checked />}
+            </Item>
+          ))}
+        </ItemContent>
       </Items>
     </Container>
   )
-  return withLabel({ label, input, className })
+  return withLabel({
+    label,
+    valid: !onceOpened || !!selected,
+    warning: <Warning text="Please select an option" />,
+    input,
+    className,
+  })
 }
 
-const Container = styled.div``
+const Container = styled.div`
+  position: relative;
+`
 
 const SelectContainer = styled(InputContainer)`
   cursor: pointer;
@@ -44,10 +132,50 @@ const Icon = styled(RoundedIcon)`
   margin-right: 1em;
 `
 
+const IconSvg = styled(ChevronDown)`
+  transition: transform 0.2s ease-out;
+`
+
 const PlaceHolder = styled.span`
   color: ${({ theme }) => theme.FooterText};
 `
+const Items = styled.div`
+  position: absolute;
+  opacity: 0;
+  transform: scale(0);
+  transform-origin: top left;
+  transition:
+    opacity 200ms ease-out,
+    transform ${FADE_OUT_DURATION}ms ease-out;
+  background-color: ${({ theme }) => theme.Background};
+  width: 100%;
+  z-index: 20;
+`
 
-const Items = styled.div``
+const ItemContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 0.5em 0;
+  justify-content: space-between;
+  border: 1px solid ${({ theme }) => theme.FooterText};
+  border-radius: ${Borders.ButtonRadius};
+  box-shadow:
+    0px 20px 24px -4px ${({ theme }) => theme.ShadowInner},
+    0px 8px 8px -4px ${({ theme }) => theme.ShadowOuter};
+  > * {
+    z-index: 20;
+    overflow: hidden;
+    padding: 0.5em 1em;
+    cursor: pointer;
+  }
+  > *:hover {
+    background-color: ${({ theme }) => theme.HoverArea};
+  }
+`
 
-const ItemContent = styled.div``
+const Item = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`

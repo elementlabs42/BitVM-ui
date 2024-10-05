@@ -1,6 +1,6 @@
 import { Accordion, ContentWithIcon, ContentWithIconAndAction, PaginationPanel } from '@/components/controls'
 import { Refresh } from '@/components/icons'
-import { Checked, PegIn, PegOut } from '@/components/icons/history'
+import { CircledChecked, PegIn, PegOut } from '@/components/icons/history'
 import { Page } from '@/components/layout'
 import styled from 'styled-components'
 
@@ -149,7 +149,7 @@ export default function History() {
                 <span>{d.status}</span>
               </Graph>
               {d.txns.map((t, j) => (
-                <Transaction key={j} icon={<Checked />} actionIcon={<Refresh />} onAction={() => {}}>
+                <Transaction key={j} icon={<CircledChecked />} actionIcon={<Refresh />} onAction={() => {}}>
                   <span>transaction: {t.hash}</span>
                   <span>{t.status}</span>
                 </Transaction>
