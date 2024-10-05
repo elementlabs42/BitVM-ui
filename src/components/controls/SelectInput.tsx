@@ -9,6 +9,7 @@ import { Checked } from '../icons/history'
 
 interface Props {
   label: ReactNode
+  notifyValidation?: (valid: boolean) => void
   placeHolder?: ReactNode
   children: ReactNode
   className?: string
@@ -16,9 +17,8 @@ interface Props {
 
 const FADE_OUT_DURATION = 120
 
-export function SelectInput({ label, placeHolder = '', children, className }: Props) {
+export function SelectInput({ label, notifyValidation, placeHolder = '', children, className }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
   const iconRef = useRef<SVGSVGElement>(null)
   const items = Children.toArray(children)
   const itemsRef = useRef<HTMLDivElement[] | null[]>([])
@@ -26,6 +26,7 @@ export function SelectInput({ label, placeHolder = '', children, className }: Pr
   const [onceOpened, setOnceOpened] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string | null>()
   const [selected, setSelected] = useState<Element | null>(null)
+  const [valid, setValid] = useState(true)
 
   const toggleSelect = () => {
     if (!open) {
@@ -75,6 +76,13 @@ export function SelectInput({ label, placeHolder = '', children, className }: Pr
     }
   }, [selectedKey])
 
+  useEffect(() => {
+    setValid(!onceOpened || !!selected)
+    if (notifyValidation) {
+      notifyValidation(!!selected)
+    }
+  }, [onceOpened, selected, notifyValidation])
+
   const select = selected ? (
     <Select dangerouslySetInnerHTML={{ __html: selected.outerHTML }} />
   ) : (
@@ -89,7 +97,7 @@ export function SelectInput({ label, placeHolder = '', children, className }: Pr
       </SelectContainer>
       <Items ref={wrapperRef}>
         {open && <Hidden onClick={toggleSelect} />}
-        <ItemContent ref={contentRef}>
+        <ItemContent>
           {items.map((item, i) => (
             <Item
               key={i}
@@ -109,7 +117,7 @@ export function SelectInput({ label, placeHolder = '', children, className }: Pr
   )
   return withLabel({
     label,
-    valid: !onceOpened || !!selected,
+    valid,
     warning: <Warning text="Please select an option" />,
     input,
     className,

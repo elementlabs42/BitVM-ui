@@ -4,6 +4,7 @@ import { useDebounce } from '@/hooks/useDebounce'
 import { IconProps } from '../icons/_base'
 import { RoundedElement } from './Rounded'
 import { InputContainer, InputIcon, InputStyle, withLabel } from './common'
+import { empty } from '@/utils'
 
 interface Props {
   label: ReactNode
@@ -80,18 +81,20 @@ export function TextInput({
   const [valid, setValid] = useState(true)
   const [text, setText] = useState('')
   const debouncedText = useDebounce(text, 500)
+  const [onceChecked, setOnceChecked] = useState(false)
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value)
+    setOnceChecked(true)
   }
 
   useEffect(() => {
-    if (validate && debouncedText !== '') {
+    if (validate && (onceChecked || !empty(debouncedText))) {
       setValid(validate(debouncedText))
     } else {
       setValid(true)
     }
-  }, [debouncedText, validate])
+  }, [onceChecked, debouncedText, validate])
 
   const input = (
     <InputContainer>

@@ -10,17 +10,19 @@ import {
 import { BackgroundPattern } from '@/components/controls'
 import { Bitcoin, Swap } from '@/components/icons'
 import { Page, Panel } from '@/components/layout'
+import { empty } from '@/utils'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 export default function Bridge() {
-  const [formValid, setFormValid] = useState(true)
-  const [amountValid, setAmountValid] = useState(true)
-  const [addressValid, setAddressValid] = useState(true)
+  const [formValid, setFormValid] = useState(false)
+  const [amountValid, setAmountValid] = useState(false)
+  const [addressValid, setAddressValid] = useState(false)
+  const [selectValid, setSelectValid] = useState(false)
 
   useEffect(() => {
-    setFormValid(amountValid && addressValid)
-  }, [amountValid, addressValid])
+    setFormValid(amountValid && addressValid && selectValid)
+  }, [amountValid, addressValid, selectValid])
 
   const selectLabel = <Label text={'You Supply'} withHelp={true} />
   const warningLabel = <Warning text={'The satoshi equivalent of the number is a power of 2'} withHelp={true} />
@@ -35,6 +37,7 @@ export default function Bridge() {
           <Supplementary>Supply BTC to send eBTC to your Ethereum wallet</Supplementary>
           <SelectInput
             label={<Label text={'Select Bitcoin account to bridge'} withHelp={true} />}
+            notifyValidation={setSelectValid}
             placeHolder="Select Bitcoin account"
           >
             <Account>
@@ -54,7 +57,7 @@ export default function Bridge() {
             label={selectLabel}
             placeHolder="0.0"
             validate={(t) => {
-              const result = t === 'aaa'
+              const result = !empty(t) ? t === 'aaa' : false
               setAmountValid(result)
               return result
             }}
@@ -66,7 +69,7 @@ export default function Bridge() {
           <TextInput
             label={<Label text={'Recipient address'} />}
             validate={(t) => {
-              const result = t === 'aaa'
+              const result = !empty(t) ? t === 'aaa' : false
               setAddressValid(result)
               return result
             }}
