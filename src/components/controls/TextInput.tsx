@@ -22,6 +22,8 @@ interface ActionProps extends Omit<Props, 'action'> {
   onAction?: (ref: React.RefObject<HTMLInputElement>) => void
 }
 
+const VALIDATION_DELAY = 500
+
 export function TextInputWithAction({
   label,
   validate,
@@ -79,9 +81,10 @@ export function TextInput({
   inputRef,
 }: Props) {
   const [valid, setValid] = useState(true)
-  const [text, setText] = useState('')
-  const debouncedText = useDebounce(text, 500)
   const [onceChecked, setOnceChecked] = useState(false)
+  const [text, setText] = useState('')
+  const debouncedText = useDebounce(text, VALIDATION_DELAY)
+  const debouncedOnceChecked = useDebounce(onceChecked, VALIDATION_DELAY)
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value)
@@ -89,12 +92,12 @@ export function TextInput({
   }
 
   useEffect(() => {
-    if (validate && (onceChecked || !empty(debouncedText))) {
+    if (validate && (debouncedOnceChecked || !empty(debouncedText))) {
       setValid(validate(debouncedText))
     } else {
       setValid(true)
     }
-  }, [onceChecked, debouncedText, validate])
+  }, [debouncedOnceChecked, debouncedText, validate])
 
   const input = (
     <InputContainer>
