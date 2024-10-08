@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { forwardRef, ReactNode } from 'react'
 import styled from 'styled-components'
 
 interface Props {
@@ -14,19 +14,24 @@ export interface IconProps {
   className?: string
 }
 
-export function SvgIcon({ className, viewBox, fill, stroke, strokeWidth, children }: Props) {
-  return (
-    <Svg
-      className={className}
-      viewBox={viewBox}
-      fill={fill ?? 'currentColor'}
-      stroke={stroke ?? 'currentColor'}
-      strokeWidth={strokeWidth ?? '0'}
-    >
-      {children}
-    </Svg>
-  )
-}
+export const SvgIcon = forwardRef<SVGSVGElement, Props>(
+  ({ className, viewBox, fill, stroke, strokeWidth, children }, ref) => {
+    return (
+      <Svg
+        className={className}
+        viewBox={viewBox}
+        fill={fill ?? 'currentColor'}
+        stroke={stroke ?? 'currentColor'}
+        strokeWidth={strokeWidth ?? '0'}
+        ref={ref}
+      >
+        {children}
+      </Svg>
+    )
+  },
+)
+
+SvgIcon.displayName = 'SvgIcon'
 
 const Svg = styled.svg`
   width: 1em;

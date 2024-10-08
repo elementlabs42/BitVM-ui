@@ -1,7 +1,7 @@
 import { ReactElement } from 'react'
 import styled from 'styled-components'
 import { IconProps } from '../icons/_base'
-import { RoundedIcon } from './RoundedIcon'
+import { RoundedIcon } from './Rounded'
 
 interface Props {
   children: ReactElement[]
@@ -26,6 +26,7 @@ export function ContentWithIcon({ children, icon, className }: Props) {
 const Container = styled.div`
   display: flex;
   flex-direction: row;
+  column-gap: 0.6em;
 `
 
 const ContentWrapper = styled.div`

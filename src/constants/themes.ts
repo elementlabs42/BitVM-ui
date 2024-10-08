@@ -1,6 +1,10 @@
 export const Colors = {
   Black: '#000',
+  BlackTransparent: 'rgba(0, 0, 0, 0.6)',
   White: '#FFFFFF',
+  WhiteTransparent: 'rgba(255, 255, 255, 0.6)',
+
+  Red: '#D92D20',
 
   LightestGray: '#F9FAFB',
   LightGray: '#8D8D8D',
@@ -29,7 +33,9 @@ export const LightTheme = {
   PrimaryText: Colors.TextPrimary900,
   SecondaryText: Colors.TextSecondary,
   Text: Colors.Black,
+  Warning: Colors.Red,
   Background: Colors.White,
+  BackgroundTransparent: Colors.WhiteTransparent,
 
   Hover: Colors.DarkBlue,
   HoverArea: Colors.LightestGray,
@@ -62,7 +68,9 @@ export const DarkTheme = {
   SecondaryText: Colors.TextSecondary,
  
   Text: Colors.White,
+  Warning: Colors.Red,
   Background: Colors.Black,
+  BackgroundTransparent: Colors.BlackTransparent,
 
   Hover: Colors.DarkBlue,
   HoverArea: Colors.DarkestGray,

@@ -1,7 +1,7 @@
 import { ReactElement, useState } from 'react'
 import styled from 'styled-components'
-import { Borders } from '@/constants/themes'
 import { Pagination } from './Pagination'
+import { Panel } from '../layout/Panel'
 
 interface Props {
   children: ReactElement[]
@@ -29,16 +29,11 @@ export function PaginationPanel({ children, perPage = 6, className }: Props) {
   )
 }
 
-const Container = styled.div`
+const Container = styled(Panel)`
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: ${({ theme }) => theme.Background};
-  border-radius: ${Borders.PanelRadius};
-  box-shadow:
-    0px 20px 24px -4px ${({ theme }) => theme.ShadowInner},
-    0px 8px 8px -4px ${({ theme }) => theme.ShadowOuter};
 `
 
 const Content = styled.div``

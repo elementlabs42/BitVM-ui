@@ -1,6 +1,6 @@
 import { Accordion, ContentWithIcon, ContentWithIconAndAction, PaginationPanel } from '@/components/controls'
 import { Refresh } from '@/components/icons'
-import { Checked, PegIn, PegOut } from '@/components/icons/history'
+import { CircledChecked, PegIn, PegOut } from '@/components/icons/history'
 import { Page } from '@/components/layout'
 import styled from 'styled-components'
 
@@ -139,7 +139,7 @@ export default function History() {
     <Page>
       <main>
         <Title>History</Title>
-        <Panel>
+        <PaginationPanel>
           {data.map((d, i) => (
             <Accordion key={i}>
               <Graph icon={d.type === 'in' ? <PegIn /> : <PegOut />}>
@@ -149,7 +149,7 @@ export default function History() {
                 <span>{d.status}</span>
               </Graph>
               {d.txns.map((t, j) => (
-                <Transaction key={j} icon={<Checked />} actionIcon={<Refresh />} onAction={() => {}}>
+                <Transaction key={j} icon={<CircledChecked />} actionIcon={<Refresh />} onAction={() => {}}>
                   <span>transaction: {t.hash}</span>
                   <span>{t.status}</span>
                 </Transaction>
@@ -215,7 +215,7 @@ export default function History() {
               <span>Pending</span>
             </Graph>
           </Accordion> */}
-        </Panel>
+        </PaginationPanel>
       </main>
     </Page>
   )
@@ -224,12 +224,6 @@ export default function History() {
 const Title = styled.h1`
   margin: 0;
   padding: 0 1vw;
-`
-
-const Panel = styled(PaginationPanel)`
-  margin: 3vh 0;
-  padding: 1vh 2vw 1.6vw 2vw;
-  min-height: 60vh;
 `
 
 const Graph = styled(ContentWithIcon)``
