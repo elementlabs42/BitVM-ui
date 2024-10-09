@@ -1,29 +1,46 @@
+import '@rainbow-me/rainbowkit/styles.css';
+
+import {
+  useConnectModal,
+} from '@rainbow-me/rainbowkit';
 import { Circle } from '@/components/icons/Circle';
 import { Page } from '@/components/layout'
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
+import { useBTCConnector } from '@/hooks/useBTCConnector';
+import { FilledCircle } from '@/components/icons/FilledCircle';
+import { LedgerModal } from '@/components/modals/LedgerModal';
+
 
 export default function Home() {
   const [connectorType, setConnectorType] = useState<"BTC" | "EVM" | null>(null);
+  const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false);
+  const { selectUnisat, isUnisatConnected, isLedgerConnected, isTrezorConnected, selectLedger, selectTrezor} = useBTCConnector();
+  const { openConnectModal } = useConnectModal();
+
   return (
-    <Page>
-      { connectorType === "BTC" ?  <Container>
+      <Page>
+        { connectorType === "BTC" ?  <Container>
+          <LedgerModal isVisible={isLedgerModalVisible} onClose={() => setIsLedgerModalVisible(false)} onConfirm={selectLedger}>
+            </ LedgerModal>
           <Header>Select your Bitcoin Wallet</Header>
           <SubTitle>If you're using a hardware wallet like Ledger, please connect it to your computer and select the corresponding device.</SubTitle>
           <Connectors>
-            <BTCConnector>
-              <Circle />
+            <BTCConnector onClick={() => setIsLedgerModalVisible(true)}>
+              {isLedgerConnected() ? <FilledCircle /> : <Circle />}
               <WalletType>Ledger</WalletType>
             </BTCConnector>
-            <BTCConnector>
-              <Circle />
+            <BTCConnector onClick={selectTrezor}>
+              {isTrezorConnected() ? <FilledCircle /> : <Circle />}
               <WalletType>Trezor</WalletType>
             </BTCConnector>
-            <BTCConnector>
-              <Circle />
-              <WalletType>Unisat</WalletType>
+            <BTCConnector style={{borderRight: "none"}} onClick={selectUnisat}>
+              {isUnisatConnected() ? <FilledCircle /> : <Circle />}
+              <WalletType>
+                Unisat
+                </WalletType>
             </BTCConnector>
-            <BTCConnector style={{borderRight: "none"}}>
+            <BTCConnector>
               <Circle />
               <WalletType>Satoshi</WalletType>
             </BTCConnector>
@@ -37,7 +54,7 @@ export default function Home() {
         </SubTitle>
         <ButtonContainer>
           <BTC2eBTCButton onClick={() => setConnectorType("BTC")}>BTC to eBTC</BTC2eBTCButton>
-          <EBTC2BTCButton>eBTC to BTC</EBTC2BTCButton>
+          <EBTC2BTCButton onClick={openConnectModal}>eBTC to BTC</EBTC2BTCButton>
         </ButtonContainer>
       </Container>
      }
@@ -47,6 +64,10 @@ export default function Home() {
 
 const Container = styled.main`
   margin-top: 9rem;
+`
+
+const Disconnect = styled.div`
+  cursor: pointer;
 `
 
 const Header = styled.div`

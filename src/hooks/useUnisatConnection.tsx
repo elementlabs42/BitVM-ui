@@ -1,11 +1,17 @@
-// hooks/useUnisatConnection.js
 import { useEffect, useRef, useState } from "react";
 import { message } from "antd";
-import { ChainType } from "./const";
+import { ChainType } from "@/constants/unisat";
 
 export const useUnisatConnection = () => {
   const [unisatInstalled, setUnisatInstalled] = useState(false);
-  const [connected, setConnected] = useState(false);
+  const [connected, setConnected] = useState(() => {
+    return typeof window !== 'undefined' ? window.localStorage.getItem('unisatConnected') === 'true' : false;
+  });
+
+  useEffect(() => {
+    typeof window !== 'undefined' && window.localStorage.setItem('unisatConnected', connected ? 'true' : 'false');
+  }, [connected]);
+
   const [accounts, setAccounts] = useState<string[]>([]);
   const [publicKey, setPublicKey] = useState("");
   const [address, setAddress] = useState("");
@@ -57,7 +63,10 @@ export const useUnisatConnection = () => {
   };
 
   const getBasicInfo = async () => {
+    console.log("getBasicInfo");
     const unisat = (window as any).unisat;
+    if (!unisat) return;
+    console.log("unisat", unisat)
     try {
       const accounts = await unisat.getAccounts();
       setAccounts(accounts);
@@ -101,7 +110,7 @@ export const useUnisatConnection = () => {
     }
   };
 
-  useEffect(() => {
+  const connect = async () => {
     const checkUnisat = async () => {
       let unisat = (window as any).unisat;
       for (let i = 1; i < 10 && !unisat; i += 1) {
@@ -111,34 +120,48 @@ export const useUnisatConnection = () => {
 
       if (unisat) {
         setUnisatInstalled(true);
-      } else if (!unisat) return;
-
-      unisat
-        .getAccounts()
-        .then((accounts: string[]) => {
+        try {
+          const accounts = await unisat.requestAccounts();
           handleAccountsChanged(accounts);
-        })
-        .catch((e: any) => {
+        } catch (e) {
           message.error((e as any).message);
-        });
+        }
 
-      unisat.on("accountsChanged", handleAccountsChanged);
-      unisat.on("networkChanged", handleNetworkChanged);
-      unisat.on("chainChanged", handleChainChanged);
-
-      return () => {
-        unisat.removeListener("accountsChanged", handleAccountsChanged);
-        unisat.removeListener("networkChanged", handleNetworkChanged);
-        unisat.removeListener("chainChanged", handleChainChanged);
-      };
+        unisat.on("accountsChanged", handleAccountsChanged);
+        unisat.on("networkChanged", handleNetworkChanged);
+        unisat.on("chainChanged", handleChainChanged);
+      } else {
+        setUnisatInstalled(false);
+      }
     };
 
-    checkUnisat();
-  }, []);
+    await checkUnisat();
+  };
+
+  const disconnect = () => {
+    const unisat = (window as any).unisat;
+    if (unisat) {
+      unisat.removeListener("accountsChanged", handleAccountsChanged);
+      unisat.removeListener("networkChanged", handleNetworkChanged);
+      unisat.removeListener("chainChanged", handleChainChanged);
+    }
+    setConnected(false);
+    setAccounts([]);
+    setPublicKey("");
+    setAddress("");
+    setBalance({ confirmed: 0, unconfirmed: 0, total: 0 });
+  };
+  useEffect(() => {
+    if (connected) {
+      connect();
+    }
+  }, [connected]);
 
   return {
     unisatInstalled,
     connected,
+    connect,
+    disconnect,  
     accounts,
     publicKey,
     address,

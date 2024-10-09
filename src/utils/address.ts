@@ -1,14 +1,12 @@
-import BigNumber from "bignumber.js";
-
-export function satoshisToAmount(val: number) {
-  const num = new BigNumber(val);
-  return num.dividedBy(100000000).toFixed(8);
+export function formatAddress(address: string, startLength = 6, endLength = 4) {
+    if (address.length <= startLength + endLength) {
+      return address; // Return the full address if it's shorter than the total of start and end lengths
+    }
+    const start = address.slice(0, startLength);
+    const end = address.slice(-endLength);
+    return `${start}...${end}`;
 }
 
-export function amountToSatoshis(val: any) {
-  const num = new BigNumber(val);
-  return num.multipliedBy(100000000).toNumber();
-}
 
 export const copyToClipboard = (textToCopy: string | number) => {
   if (navigator.clipboard && window.isSecureContext) {
@@ -29,3 +27,5 @@ export const copyToClipboard = (textToCopy: string | number) => {
     });
   }
 };
+
+  
