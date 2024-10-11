@@ -1,5 +1,6 @@
 export enum BTCConnectorType {
-    UNISAT = "UNISAT",
-    LEDGER = "LEDGER",
-    TREZOR = "TREZOR",
+  NONE = 'NONE',
+  UNISAT = 'UNISAT',
+  LEDGER = 'LEDGER',
+  TREZOR = 'TREZOR',
 }

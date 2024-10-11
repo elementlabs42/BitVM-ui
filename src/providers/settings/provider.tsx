@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function SettingsProvider({ children }: Props) {
-  const [savedSettings, setSettings] = useLocalStorage(SETTINGS_VERSION, DEFAULT_SETTINGS)
+  const [savedSettings, setSettings] = useLocalStorage<Settings>(SETTINGS_VERSION, DEFAULT_SETTINGS)
 
   const settings: Settings = {
     ...DEFAULT_SETTINGS,

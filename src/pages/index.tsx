@@ -1,30 +1,35 @@
-import '@rainbow-me/rainbowkit/styles.css';
+import '@rainbow-me/rainbowkit/styles.css'
 
-import {
-  useConnectModal,
-} from '@rainbow-me/rainbowkit';
-import { Circle } from '@/components/icons/Circle';
+import { useConnectModal } from '@rainbow-me/rainbowkit'
+import { Circle } from '@/components/icons/Circle'
 import { Page } from '@/components/layout'
-import { useState } from 'react';
-import styled from 'styled-components';
-import { useBTCConnector } from '@/hooks/useBTCConnector';
-import { FilledCircle } from '@/components/icons/FilledCircle';
-import { LedgerModal } from '@/components/modals/LedgerModal';
-
+import { useState } from 'react'
+import styled from 'styled-components'
+import { useBTCConnector } from '@/hooks/useBTCConnector'
+import { FilledCircle } from '@/components/icons/FilledCircle'
+import { LedgerModal } from '@/components/modals/LedgerModal'
 
 export default function Home() {
-  const [connectorType, setConnectorType] = useState<"BTC" | "EVM" | null>(null);
-  const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false);
-  const { selectUnisat, isUnisatConnected, isLedgerConnected, isTrezorConnected, selectLedger, selectTrezor} = useBTCConnector();
-  const { openConnectModal } = useConnectModal();
+  const [connectorType, setConnectorType] = useState<'BTC' | 'EVM' | null>(null)
+  const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false)
+  const { selectUnisat, isUnisatConnected, isLedgerConnected, isTrezorConnected, selectLedger, selectTrezor } =
+    useBTCConnector()
+  const { openConnectModal } = useConnectModal()
 
   return (
-      <Page>
-        { connectorType === "BTC" ?  <Container>
-          <LedgerModal isVisible={isLedgerModalVisible} onClose={() => setIsLedgerModalVisible(false)} onConfirm={selectLedger}>
-            </ LedgerModal>
+    <Page>
+      {connectorType === 'BTC' ? (
+        <Container>
+          <LedgerModal
+            isVisible={isLedgerModalVisible}
+            onClose={() => setIsLedgerModalVisible(false)}
+            onConfirm={selectLedger}
+          ></LedgerModal>
           <Header>Select your Bitcoin Wallet</Header>
-          <SubTitle>If you're using a hardware wallet like Ledger, please connect it to your computer and select the corresponding device.</SubTitle>
+          <SubTitle>
+            If you are using a hardware wallet like Ledger, please connect it to your computer and select the
+            corresponding device.
+          </SubTitle>
           <Connectors>
             <BTCConnector onClick={() => setIsLedgerModalVisible(true)}>
               {isLedgerConnected() ? <FilledCircle /> : <Circle />}
@@ -34,40 +39,35 @@ export default function Home() {
               {isTrezorConnected() ? <FilledCircle /> : <Circle />}
               <WalletType>Trezor</WalletType>
             </BTCConnector>
-            <BTCConnector style={{borderRight: "none"}} onClick={selectUnisat}>
+            <BTCConnector style={{ borderRight: 'none' }} onClick={selectUnisat}>
               {isUnisatConnected() ? <FilledCircle /> : <Circle />}
-              <WalletType>
-                Unisat
-                </WalletType>
+              <WalletType>Unisat</WalletType>
             </BTCConnector>
             <BTCConnector>
               <Circle />
               <WalletType>Satoshi</WalletType>
             </BTCConnector>
           </Connectors>
-      </Container> :
-      <Container>
-        <Header>A 2-way peg bridging BTC to Ethereum</Header>
-        <SubTitle>
-          Once bridged, your BTC becomes eBTC, an ERC20 token backed 1:1 by Bitcoin. Your deposit is secured by
-          immutable code, not centralized custodians, and can be redeemed anytime.
-        </SubTitle>
-        <ButtonContainer>
-          <BTC2eBTCButton onClick={() => setConnectorType("BTC")}>BTC to eBTC</BTC2eBTCButton>
-          <EBTC2BTCButton onClick={openConnectModal}>eBTC to BTC</EBTC2BTCButton>
-        </ButtonContainer>
-      </Container>
-     }
+        </Container>
+      ) : (
+        <Container>
+          <Header>A 2-way peg bridging BTC to Ethereum</Header>
+          <SubTitle>
+            Once bridged, your BTC becomes eBTC, an ERC20 token backed 1:1 by Bitcoin. Your deposit is secured by
+            immutable code, not centralized custodians, and can be redeemed anytime.
+          </SubTitle>
+          <ButtonContainer>
+            <BTC2eBTCButton onClick={() => setConnectorType('BTC')}>BTC to eBTC</BTC2eBTCButton>
+            <EBTC2BTCButton onClick={openConnectModal}>eBTC to BTC</EBTC2BTCButton>
+          </ButtonContainer>
+        </Container>
+      )}
     </Page>
   )
 }
 
 const Container = styled.main`
   margin-top: 9rem;
-`
-
-const Disconnect = styled.div`
-  cursor: pointer;
 `
 
 const Header = styled.div`
@@ -106,7 +106,7 @@ const EBTC2BTCButton = styled.button`
   font-weight: 600;
   padding: 1rem;
   border-radius: 0.5rem;
-  border: 1px solid #D0D5DD;
+  border: 1px solid #d0d5dd;
   cursor: pointer;
 `
 
