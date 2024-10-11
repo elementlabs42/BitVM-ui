@@ -16,11 +16,9 @@ export const Colors = {
   TextPrimary900: '#101828',
   TertiaryColor: '#475467',
   TextSecondary: '#344054',
-  
 }
 
 export const LightTheme = {
-
   NavigationText: Colors.TertiaryColor,
   SubTitleText: Colors.TertiaryColor,
 
@@ -59,14 +57,14 @@ export const DarkTheme = {
   ButtonDarkBg: Colors.DarkBlue,
   ButtonDarkText: Colors.White,
 
-  ButtonBorderColor: "#D0D5DD",
+  ButtonBorderColor: '#D0D5DD',
 
   ButtonLightBg: Colors.White,
   ButtonLightText: Colors.Black,
 
   PrimaryText: Colors.TextPrimary900,
   SecondaryText: Colors.TextSecondary,
- 
+
   Text: Colors.White,
   Warning: Colors.Red,
   Background: Colors.Black,
