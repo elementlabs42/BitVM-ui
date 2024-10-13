@@ -1,3 +1,3 @@
-export function getErrorOnly(err: unknown): Error {
-  return err instanceof Error ? err : new Error(`Unknown Error`)
+export function getErrorOnly(err: unknown, message?: string): Error {
+  return err instanceof Error ? err : new Error(message ?? `Unknown Error`)
 }
