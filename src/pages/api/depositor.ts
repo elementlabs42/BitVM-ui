@@ -29,7 +29,7 @@ function validateDepositor(req: NextApiRequest): ValidationResult<DepositorArgs>
   ) {
     return { status: 400, error: 'Invalid bitcoin public key' }
   } else {
-    result.args = { pubkey: req.query.pubkey }
+    result.args = { ...result.args, pubkey: req.query.pubkey }
   }
 
   return result
@@ -40,7 +40,6 @@ function getDepositorStatus(client: BitvmService, publicKey: string): BitvmRespo
     return { status: BitvmReponseStatus.OK, data: client.getDepositorStatus(publicKey) }
   } catch (err) {
     const error = getErrorOnly(err).message
-    console.log(error)
-    return { status: BitvmReponseStatus.NOK, error: 'Internal error' }
+    return { status: BitvmReponseStatus.NOK, error }
   }
 }
