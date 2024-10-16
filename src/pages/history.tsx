@@ -1,4 +1,4 @@
-import { Accordion, ContentWithIcon, ContentWithIconAndAction, Label, PaginationPanel } from '@/components/controls'
+import { Accordion, ContentWithIcon, ContentWithIconAndAction, PaginationPanel } from '@/components/controls'
 import { Refresh } from '@/components/icons'
 import { CircledChecked, PegIn, PegOut } from '@/components/icons/history'
 import { Page } from '@/components/layout'
@@ -7,32 +7,31 @@ import { GraphType } from '@/types'
 import styled from 'styled-components'
 
 export default function History() {
-  const { response, isLoading } = useBitvm()
+  const { response } = useBitvm()
   console.log('response in history', response)
   return (
     <Page>
       <main>
         <Title>History</Title>
-        <PaginationPanel isLoading={isLoading}>
-          {response.data
-            ? response.data?.map((graph, i) => (
-                <Accordion key={i}>
-                  <Graph icon={graph.type === GraphType.PEG_IN ? <PegIn /> : <PegOut />}>
-                    <span>
-                      {graph.type === GraphType.PEG_IN ? `Bridge ${graph.amount} BTC` : `Redeem ${graph.amount} eBTC`}{' '}
-                      to {'not implemented'}
-                    </span>
-                    <span>{graph.status}</span>
-                  </Graph>
-                  {graph.transactions.map((tx, j) => (
-                    <Transaction key={j} icon={<CircledChecked />} actionIcon={<Refresh />} onAction={() => {}}>
-                      <span>transaction: {tx.txId}</span>
-                      <span>{tx.status.confirmed ? 'Confirmed' : 'Pending'}</span>
-                    </Transaction>
-                  ))}
-                </Accordion>
-              ))
-            : [<Label key={0} text="No graphs found" />]}
+        <PaginationPanel>
+          {response.data &&
+            response.data?.map((graph, i) => (
+              <Accordion key={i}>
+                <Graph icon={graph.type === GraphType.PEG_IN ? <PegIn /> : <PegOut />}>
+                  <span>
+                    {graph.type === GraphType.PEG_IN ? `Bridge ${graph.amount} BTC` : `Redeem ${graph.amount} eBTC`} to{' '}
+                    {' [recipient]'}
+                  </span>
+                  <span>{graph.status}</span>
+                </Graph>
+                {graph.transactions.map((tx, j) => (
+                  <Transaction key={j} icon={<CircledChecked />} actionIcon={<Refresh />} onAction={() => {}}>
+                    <span>transaction: {tx.txId}</span>
+                    <span>{tx.status.confirmed ? 'Confirmed' : 'Pending'}</span>
+                  </Transaction>
+                ))}
+              </Accordion>
+            ))}
           {/* <Accordion>
             <Graph icon={<PegOut />}>
               <span>Redeem 2 eBTC to tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v</span>
