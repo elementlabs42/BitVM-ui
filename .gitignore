@@ -38,4 +38,4 @@ next-env.d.ts
 .nvmrc
 
 #bitvm
-bitvm/
+/bitvm

@@ -1,7 +1,9 @@
-import { BitvmReponseStatus, BitvmResponse, BitvmService, Env } from '@/services/bitvm'
+import { BitvmService } from '@/services/bitvm/bitvm'
+import { BitvmReponseStatus, BitvmResponse, Env } from '@/types'
 import { validate, ValidationResult } from '@/services/validation'
 import { getErrorOnly } from '@/utils'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { validateBitcoinPublicKey } from '@/services/bitvm/validation'
 
 type DepositorArgs = {
   pubkey: string
@@ -20,18 +22,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<BitvmR
 
 function validateDepositor(req: NextApiRequest): ValidationResult<DepositorArgs> {
   const result: ValidationResult<DepositorArgs> = { status: 200 }
-  if (
-    !(
-      req.query.pubkey &&
-      typeof req.query.pubkey === 'string' &&
-      BitvmService.validateBitcoinPublicKey(req.query.pubkey)
-    )
-  ) {
+  const pubkey = validateBitcoinPublicKey(req)
+  if (!pubkey) {
     return { status: 400, error: 'Invalid bitcoin public key' }
   } else {
-    result.args = { ...result.args, pubkey: req.query.pubkey }
+    result.args = { pubkey }
   }
-
   return result
 }
 

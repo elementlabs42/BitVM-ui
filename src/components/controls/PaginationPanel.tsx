@@ -1,18 +1,22 @@
-import { ReactElement, useState } from 'react'
+import { ReactElement, Suspense, useState } from 'react'
 import styled from 'styled-components'
 import { Pagination } from './Pagination'
 import { Panel } from '../layout/Panel'
+import { Pulse } from './common'
 
 interface Props {
+  isLoading: boolean
   children: ReactElement[]
   perPage?: number
   className?: string
 }
 
-export function PaginationPanel({ children, perPage = 6, className }: Props) {
+export function PaginationPanel({ isLoading, children, perPage = 6, className }: Props) {
   const [current, setCurrent] = useState(0)
+  // const loading = (<Loading>Loading...</Loading>)
   return (
     <Container className={className}>
+      {/* <Suspense fallback={loading}> */}
       <Content>{children.slice(current * perPage, (current + 1) * perPage)}</Content>
       {children.length > perPage && (
         <PaginationWrapper>
@@ -25,6 +29,7 @@ export function PaginationPanel({ children, perPage = 6, className }: Props) {
           />
         </PaginationWrapper>
       )}
+      {/* </Suspense> */}
     </Container>
   )
 }
@@ -42,4 +47,10 @@ const PaginationWrapper = styled.div`
   margin: 1em 3em 0 0;
   display: flex;
   justify-content: right;
+`
+
+const Loading = styled.div`
+  display: flex;
+  justify-content: center;
+  ${Pulse}
 `

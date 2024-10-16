@@ -1,161 +1,38 @@
-import { Accordion, ContentWithIcon, ContentWithIconAndAction, PaginationPanel } from '@/components/controls'
+import { Accordion, ContentWithIcon, ContentWithIconAndAction, Label, PaginationPanel } from '@/components/controls'
 import { Refresh } from '@/components/icons'
 import { CircledChecked, PegIn, PegOut } from '@/components/icons/history'
 import { Page } from '@/components/layout'
+import { useBitvm } from '@/hooks/useBitvm'
+import { GraphType } from '@/types'
 import styled from 'styled-components'
 
 export default function History() {
-  const data = [
-    {
-      type: 'in',
-      receipient: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-      amount: 2,
-      status: 'Pending',
-      txns: [
-        {
-          hash: '0x8d62bf13ccfc8b7e66abb94d44ac53977c890395bc6d9621674a64e91a2934a5',
-          status: 'Signed',
-        },
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Waiting for operators. Time remained: 2 Weeks 5 Days 10 Hours 38 Minutes 24 Seconds',
-        },
-      ],
-    },
-    {
-      type: 'out',
-      receipient: 'tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v',
-      amount: 2,
-      status: 'Pending',
-      txns: [
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Archived',
-        },
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Mined',
-        },
-        {
-          hash: 'N/A',
-          status: 'Waiting for operators.',
-        },
-      ],
-    },
-    {
-      type: 'in',
-      receipient: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-      amount: 2,
-      status: 'Pending',
-      txns: [
-        {
-          hash: '0x8d62bf13ccfc8b7e66abb94d44ac53977c890395bc6d9621674a64e91a2934a5',
-          status: 'Signed',
-        },
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Waiting for operators. Time remained: 2 Weeks 5 Days 10 Hours 38 Minutes 24 Seconds',
-        },
-      ],
-    },
-    {
-      type: 'in',
-      receipient: '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',
-      amount: 2,
-      status: 'Pending',
-      txns: [
-        {
-          hash: '0x8d62bf13ccfc8b7e66abb94d44ac53977c890395bc6d9621674a64e91a2934a5',
-          status: 'Signed',
-        },
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Waiting for operators. Time remained: 2 Weeks 5 Days 10 Hours 38 Minutes 24 Seconds',
-        },
-      ],
-    },
-    {
-      type: 'out',
-      receipient: 'tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v',
-      amount: 2,
-      status: 'Pending',
-      txns: [
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Archived',
-        },
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Mined',
-        },
-        {
-          hash: 'N/A',
-          status: 'Waiting for operators.',
-        },
-      ],
-    },
-    {
-      type: 'out',
-      receipient: 'tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v',
-      amount: 2,
-      status: 'Pending',
-      txns: [
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Archived',
-        },
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Mined',
-        },
-        {
-          hash: 'N/A',
-          status: 'Waiting for operators.',
-        },
-      ],
-    },
-    {
-      type: 'out',
-      receipient: 'tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v',
-      amount: 2,
-      status: 'Pending',
-      txns: [
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Archived',
-        },
-        {
-          hash: 'eda524639b7c7b920291ecf1b9c1084d8b538a8984918f4624922f503897bf0b',
-          status: 'Mined',
-        },
-        {
-          hash: 'N/A',
-          status: 'Waiting for operators.',
-        },
-      ],
-    },
-  ]
+  const { response, isLoading } = useBitvm()
+  console.log('response in history', response)
   return (
     <Page>
       <main>
         <Title>History</Title>
-        <PaginationPanel>
-          {data.map((d, i) => (
-            <Accordion key={i}>
-              <Graph icon={d.type === 'in' ? <PegIn /> : <PegOut />}>
-                <span>
-                  {d.type === 'in' ? `Bridge ${d.amount} BTC` : `Redeem ${d.amount} eBTC`} to {d.receipient}
-                </span>
-                <span>{d.status}</span>
-              </Graph>
-              {d.txns.map((t, j) => (
-                <Transaction key={j} icon={<CircledChecked />} actionIcon={<Refresh />} onAction={() => {}}>
-                  <span>transaction: {t.hash}</span>
-                  <span>{t.status}</span>
-                </Transaction>
-              ))}
-            </Accordion>
-          ))}
+        <PaginationPanel isLoading={isLoading}>
+          {response.data
+            ? response.data?.map((graph, i) => (
+                <Accordion key={i}>
+                  <Graph icon={graph.type === GraphType.PEG_IN ? <PegIn /> : <PegOut />}>
+                    <span>
+                      {graph.type === GraphType.PEG_IN ? `Bridge ${graph.amount} BTC` : `Redeem ${graph.amount} eBTC`}{' '}
+                      to {'not implemented'}
+                    </span>
+                    <span>{graph.status}</span>
+                  </Graph>
+                  {graph.transactions.map((tx, j) => (
+                    <Transaction key={j} icon={<CircledChecked />} actionIcon={<Refresh />} onAction={() => {}}>
+                      <span>transaction: {tx.txId}</span>
+                      <span>{tx.status.confirmed ? 'Confirmed' : 'Pending'}</span>
+                    </Transaction>
+                  ))}
+                </Accordion>
+              ))
+            : [<Label key={0} text="No graphs found" />]}
           {/* <Accordion>
             <Graph icon={<PegOut />}>
               <span>Redeem 2 eBTC to tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v</span>

@@ -1,8 +1,9 @@
-import { BitvmReponseStatus, BitvmResponse, BitvmService, Env } from '@/services/bitvm'
+import { BitvmService } from '@/services/bitvm/bitvm'
+import { BitvmReponseStatus, BitvmResponse, Env } from '@/types'
 import { validate, ValidationResult } from '@/services/validation'
 import { getErrorOnly } from '@/utils'
-import { ethers } from 'ethers'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { validateBitcoinPublicKey, validateEthereumAddress } from '@/services/bitvm/validation'
 
 type WithdrawerArgs = {
   pubkey: string
@@ -23,22 +24,18 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<BitvmR
 function validateHistory(req: NextApiRequest): ValidationResult<WithdrawerArgs> {
   const result: ValidationResult<WithdrawerArgs> = { status: 200 }
 
-  if (
-    !(
-      req.query.pubkey &&
-      typeof req.query.pubkey === 'string' &&
-      BitvmService.validateBitcoinPublicKey(req.query.pubkey)
-    )
-  ) {
+  const pubkey = validateBitcoinPublicKey(req)
+  if (!pubkey) {
     return { status: 400, error: 'Invalid bitcoin public key' }
   } else {
-    result.args = { pubkey: req.query.pubkey, address: '' }
+    result.args = { pubkey, address: '' }
   }
 
-  if (!(req.query.address && typeof req.query.address === 'string' && ethers.isAddress(req.query.address))) {
+  const address = validateEthereumAddress(req)
+  if (!address) {
     return { status: 400, error: 'Invalid ethereum address' }
   } else {
-    result.args = { ...result.args, address: req.query.address }
+    result.args = { ...result.args, address }
   }
 
   return result
