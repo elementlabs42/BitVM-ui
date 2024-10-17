@@ -1,34 +1,53 @@
-import { ReactElement, useState } from 'react'
+import { Children, ReactNode, useEffect } from 'react'
 import styled from 'styled-components'
-import { Pagination } from './Pagination'
+import { Pager } from './Pager'
 import { Panel } from '../layout/Panel'
-import { Pulse } from './common'
+import { PaginationProvider, usePagination } from '@/providers/Pagination'
+import { Loading } from './common'
 
 interface Props {
-  children?: ReactElement[]
-  perPage?: number
+  children?: ReactNode
   className?: string
 }
+export function PaginationPanel({ children, className }: Props) {
+  return (
+    <PaginationProvider>
+      <PaginationPanelInternal className={className}>{children}</PaginationPanelInternal>
+    </PaginationProvider>
+  )
+}
 
-export function PaginationPanel({ children, perPage = 6, className }: Props) {
-  const [current, setCurrent] = useState(0)
+function PaginationPanelInternal({ children, className }: Props) {
+  const elements = Children.toArray(children)
+  const { total, setTotal, perPage, current, setCurrent } = usePagination()
+
+  useEffect(() => {
+    if (elements.length > 1) {
+      setTotal(elements.length)
+    }
+  }, [elements, setTotal])
+
   return (
     <Container className={className}>
       {children ? (
-        <Content>{children.slice(current * perPage, (current + 1) * perPage)}</Content>
+        elements.length > 1 ? (
+          <>{elements.slice(current * perPage, (current + 1) * perPage)}</>
+        ) : (
+          elements
+        )
       ) : (
-        <Loading>Loading...</Loading>
+        <Loading />
       )}
-      {children && children.length > perPage && (
-        <PaginationWrapper>
-          <Pagination
-            total={Math.ceil(children.length / perPage)}
+      {total > perPage && (
+        <PagerWrapper>
+          <Pager
+            total={Math.ceil(total / perPage)}
             current={current}
             onPageClick={(pageIndex) => {
               setCurrent(pageIndex)
             }}
           />
-        </PaginationWrapper>
+        </PagerWrapper>
       )}
     </Container>
   )
@@ -41,19 +60,8 @@ const Container = styled(Panel)`
   justify-content: space-between;
 `
 
-const Content = styled.div``
-
-const PaginationWrapper = styled.div`
+const PagerWrapper = styled.div`
   margin: 1em 3em 0 0;
   display: flex;
   justify-content: right;
-`
-
-const Loading = styled.div`
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  ${Pulse}
 `
