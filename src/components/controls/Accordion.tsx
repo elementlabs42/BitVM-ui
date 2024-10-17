@@ -2,10 +2,15 @@ import { Children, ReactNode, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { ChevronRight } from '../icons'
 import { Borders } from '@/constants/themes'
+import { useAccordionContext } from './AccordionGroup'
 
 interface Props {
   children: ReactNode
   className?: string
+}
+
+export type AccordionState = {
+  collapsed: boolean
 }
 
 const DETAIL_VERTICAL_MARGIN = 1 //em
@@ -16,6 +21,7 @@ export function Accordion({ children, className }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const expanderIconRef = useRef<SVGSVGElement>(null)
+  const { expand, collapse } = useAccordionContext()
 
   const getContentHeight = () => (contentRef.current ? contentRef.current['clientHeight'] : 0)
 
@@ -35,10 +41,12 @@ export function Accordion({ children, className }: Props) {
         node.style['height'] = `calc(${contentHeight}px + ${DETAIL_VERTICAL_MARGIN * 2}em)`
         icon.style['transform'] = 'rotate(90deg)'
         setCollapsed(false)
+        expand()
       } else {
         node.style['height'] = '0'
         icon.style['transform'] = 'rotate(0deg)'
         setCollapsed(true)
+        collapse()
       }
     }
   }

@@ -10,7 +10,7 @@ interface Props {
   className?: string
 }
 
-export function Pagination({ total, current, onPageClick, className }: Props) {
+export function Pager({ total, current, onPageClick, className }: Props) {
   return (
     <Container className={className}>
       <RoundedIcon
