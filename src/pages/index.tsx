@@ -5,15 +5,15 @@ import { Circle } from '@/components/icons/Circle'
 import { Page } from '@/components/layout'
 import { useState } from 'react'
 import styled from 'styled-components'
-import { useBTCConnector } from '@/hooks/useBTCConnector'
 import { FilledCircle } from '@/components/icons/FilledCircle'
 import { LedgerModal } from '@/components/modals/LedgerModal'
+import { useBtcConnector } from '@/providers/BtcConnector'
+import { BTCConnectorType } from '@/constants/connector'
 
 export default function Home() {
   const [connectorType, setConnectorType] = useState<'BTC' | 'EVM' | null>(null)
   const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false)
-  const { selectUnisat, isUnisatConnected, isLedgerConnected, isTrezorConnected, selectLedger, selectTrezor } =
-    useBTCConnector()
+  const { selectedProvider, connectUnisat, connectLedger, connectTrezor } = useBtcConnector()
   const { openConnectModal } = useConnectModal()
 
   return (
@@ -23,7 +23,7 @@ export default function Home() {
           <LedgerModal
             isVisible={isLedgerModalVisible}
             onClose={() => setIsLedgerModalVisible(false)}
-            onConfirm={selectLedger}
+            onConfirm={connectLedger}
           ></LedgerModal>
           <Header>Select your Bitcoin Wallet</Header>
           <SubTitle>
@@ -32,15 +32,15 @@ export default function Home() {
           </SubTitle>
           <Connectors>
             <BTCConnector onClick={() => setIsLedgerModalVisible(true)}>
-              {isLedgerConnected() ? <FilledCircle /> : <Circle />}
+              {selectedProvider === BTCConnectorType.LEDGER ? <FilledCircle /> : <Circle />}
               <WalletType>Ledger</WalletType>
             </BTCConnector>
-            <BTCConnector onClick={selectTrezor}>
-              {isTrezorConnected() ? <FilledCircle /> : <Circle />}
+            <BTCConnector onClick={connectTrezor}>
+              {selectedProvider === BTCConnectorType.TREZOR ? <FilledCircle /> : <Circle />}
               <WalletType>Trezor</WalletType>
             </BTCConnector>
-            <BTCConnector style={{ borderRight: 'none' }} onClick={selectUnisat}>
-              {isUnisatConnected() ? <FilledCircle /> : <Circle />}
+            <BTCConnector style={{ borderRight: 'none' }} onClick={connectUnisat}>
+              {selectedProvider === BTCConnectorType.UNISAT ? <FilledCircle /> : <Circle />}
               <WalletType>Unisat</WalletType>
             </BTCConnector>
             <BTCConnector>

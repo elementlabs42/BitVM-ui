@@ -1,7 +1,7 @@
 import { Modal, Riseup, Wallet } from './common'
 import { Ledger, Satoshi, Trezor, Unisat } from '../icons/wallets'
 import styled from 'styled-components'
-import { useBTCConnector } from '@/hooks/useBTCConnector'
+import { useBtcConnector } from '@/providers/BtcConnector'
 
 interface Props {
   onClosed: () => void
@@ -9,11 +9,11 @@ interface Props {
 }
 
 export function WalletModalBtc({ onClosed, className }: Props) {
-  const { selectUnisat } = useBTCConnector()
+  const { connectUnisat } = useBtcConnector()
   return (
     <StyledModal title="Connect Bitcoin Wallet" close={onClosed} className={className}>
       <Wallet icon={<Ledger />} name={'Ledger'} connect={() => {}} />
-      <Wallet icon={<Unisat />} name={'Unisat'} connect={selectUnisat} />
+      <Wallet icon={<Unisat />} name={'Unisat'} connect={connectUnisat} />
       <Wallet icon={<Trezor />} name={'Trezor'} connect={() => {}} />
       <Wallet icon={<Satoshi />} name={'Satoshi'} connect={() => {}} />
       <Spacer />

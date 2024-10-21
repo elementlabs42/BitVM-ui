@@ -16,10 +16,14 @@ export const InputIcon = styled.div`
   align-content: center;
 `
 
-export const InputStyle = css`
-  flex-grow: 1;
+export const InputBoxStyle = css`
   font-size: 1.2em;
   padding: 0.5em;
+`
+
+export const InputStyle = css`
+  ${InputBoxStyle}
+  flex-grow: 1;
   border: 0;
   &:focus-visible {
     outline: 0;

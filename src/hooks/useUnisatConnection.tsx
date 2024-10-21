@@ -6,7 +6,7 @@ import { getErrorOnly } from '@/utils'
 
 export const useUnisatConnection = () => {
   const [unisatInstalled, setUnisatInstalled] = useState(false)
-  const [connected, setConnected] = useLocalStorage<string>('unisatConnected', 'false')
+  const [connected, setConnected] = useLocalStorage<boolean>('unisatConnected', false)
 
   const [accounts, setAccounts] = useState<string[]>([])
   const [publicKey, setPublicKey] = useState('')
@@ -167,7 +167,7 @@ export const useUnisatConnection = () => {
 
   return {
     unisatInstalled,
-    connected,
+    unisatConnected: connected,
     connect,
     disconnect,
     accounts,

@@ -10,7 +10,9 @@ import {
 import { BackgroundPattern } from '@/components/controls'
 import { Bitcoin, Swap } from '@/components/icons'
 import { Page, Panel } from '@/components/layout'
-import { empty } from '@/utils'
+import { BTCConnectorType } from '@/constants/connector'
+import { useBtcConnector } from '@/providers/BtcConnector'
+import { empty, parseAddressType } from '@/utils'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
@@ -19,13 +21,74 @@ export default function Bridge() {
   const [amountValid, setAmountValid] = useState(false)
   const [addressValid, setAddressValid] = useState(false)
   const [selectValid, setSelectValid] = useState(false)
+  const { selectedProvider, isConnected, btcAddress, btcBalance } = useBtcConnector()
+  const [addressType, setAddressType] = useState('')
 
   useEffect(() => {
-    setFormValid(amountValid && addressValid && selectValid)
-  }, [amountValid, addressValid, selectValid])
+    let valid = amountValid && addressValid && isConnected
+    switch (selectedProvider) {
+      case BTCConnectorType.UNISAT:
+        break
+      case BTCConnectorType.LEDGER:
+      case BTCConnectorType.TREZOR:
+        valid = valid && selectValid
+        break
+      default:
+        valid = false
+        break
+    }
+    setFormValid(valid)
+  }, [amountValid, addressValid, selectValid, isConnected, selectedProvider])
+
+  useEffect(() => {
+    setAddressType(parseAddressType(btcAddress).address)
+  }, [btcAddress])
 
   const selectLabel = <Label text={'You Supply'} withHelp={true} />
   const warningLabel = <Warning text={'The satoshi equivalent of the number is a power of 2'} withHelp={true} />
+  const accountInfo = () => {
+    if (isConnected) {
+      switch (selectedProvider) {
+        case BTCConnectorType.UNISAT:
+          return (
+            <TextInput
+              label={<Label text={'Bitcoin account'} />}
+              value={
+                <Account>
+                  <AccountType>{addressType}</AccountType>
+                  <AccountAmount>{`${btcBalance} sat`}</AccountAmount>
+                  <AccountAddress>{btcAddress}</AccountAddress>
+                </Account>
+              }
+              disabled={true}
+            />
+          )
+        case BTCConnectorType.LEDGER:
+        case BTCConnectorType.TREZOR:
+          return (
+            <SelectInput
+              label={<Label text={'Select Bitcoin account to bridge'} withHelp={true} />}
+              notifyValidation={setSelectValid}
+              placeHolder="Select Bitcoin account"
+            >
+              <Account>
+                <AccountType>Legacy</AccountType>
+                <AccountAmount>1.19 BTC</AccountAmount>
+              </Account>
+              <Account>
+                <AccountType>SegWit</AccountType>
+                <AccountAmount>5.32 BTC</AccountAmount>
+              </Account>
+              <Account>
+                <AccountType>Native SegWit</AccountType>
+                <AccountAmount>5.32 BTC</AccountAmount>
+              </Account>
+            </SelectInput>
+          )
+      }
+    }
+    return <Warning text={'Please connect a BTC wallet'} />
+  }
   return (
     <Page>
       <Title>Confirm amount</Title>
@@ -35,24 +98,7 @@ export default function Bridge() {
           <SwapIcon icon={<Swap />} size={1} />
           <Subtitle>Bridge</Subtitle>
           <Supplementary>Supply BTC to send eBTC to your Ethereum wallet</Supplementary>
-          <SelectInput
-            label={<Label text={'Select Bitcoin account to bridge'} withHelp={true} />}
-            notifyValidation={setSelectValid}
-            placeHolder="Select Bitcoin account"
-          >
-            <Account>
-              <AccountName>Legacy</AccountName>
-              <AccountAmount>1.19 BTC</AccountAmount>
-            </Account>
-            <Account>
-              <AccountName>SegWit</AccountName>
-              <AccountAmount>5.32 BTC</AccountAmount>
-            </Account>
-            <Account>
-              <AccountName>Native SegWit</AccountName>
-              <AccountAmount>5.32 BTC</AccountAmount>
-            </Account>
-          </SelectInput>
+          {accountInfo()}
           <TextInputWithAction
             label={selectLabel}
             placeHolder="0.0"
@@ -151,7 +197,8 @@ const Account = styled.div`
   column-gap: 1em;
 `
 
-const AccountName = styled.div``
+const AccountAddress = styled.div``
+const AccountType = styled.div``
 const AccountAmount = styled.div`
   color: ${({ theme }) => theme.FooterText};
 `

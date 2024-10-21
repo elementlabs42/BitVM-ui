@@ -1,36 +1,20 @@
 import styled from 'styled-components'
 import { Navigation } from './header/Navigation'
 import { WalletButton } from './header/WalletButton'
-import { useBTCConnector } from '@/hooks/useBTCConnector'
 import { useState, useEffect } from 'react'
 import { copyToClipboard, formatAddress } from '@/utils/address'
 import useMessage from 'antd/es/message/useMessage'
 import { useAccount as useEthereumAccount } from 'wagmi'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { WalletModalBtc } from '../controls'
+import { useBtcConnector } from '@/providers/BtcConnector'
 
 export function Header() {
-  const [btcBalance, setBTCBalance] = useState<string | number>(0)
-  const [btcAddress, setBTCAddress] = useState<string>('')
-  const { isConnected: isBTCConnected, getAddress: getBTCAddress, getBalance: getBTCBalance } = useBTCConnector()
+  const { isConnected: isBTCConnected, btcAddress, btcBalance } = useBtcConnector()
   const { address: ethereumAddress } = useEthereumAccount()
   const [messageApi, contextHolder] = useMessage()
   const { openConnectModal } = useConnectModal()
   const [isBTCWalletModalOpen, setIsBTCWalletModalOpen] = useState(false)
-  const [btcWalletText, setBtcWalletText] = useState('Connect BTC Wallet')
-
-  useEffect(() => {
-    ;(async () => {
-      if (isBTCConnected()) {
-        const address = await getBTCAddress()
-        setBTCAddress(address ?? '')
-
-        const balance = await getBTCBalance()
-        setBTCBalance(balance ?? 0)
-      }
-    })()
-  }, [isBTCConnected, getBTCAddress, getBTCBalance])
-
   const copyAddress = (address: string) => {
     copyToClipboard(address)
     messageApi.success('Address copied to clipboard')
@@ -39,21 +23,20 @@ export function Header() {
   const ebtc = 0
 
   useEffect(() => {
-    if (isBTCConnected()) {
-      setBtcWalletText(`${formatAddress(btcAddress)} | ${btcBalance} sat`)
+    if (isBTCConnected) {
       setIsBTCWalletModalOpen(false)
-    } else {
-      setBtcWalletText('Connect BTC Wallet')
     }
-  }, [isBTCConnected, btcAddress, btcBalance])
+  }, [isBTCConnected])
 
+  const btcWalletText = isBTCConnected ? `${formatAddress(btcAddress)} | ${btcBalance} sat` : 'Connect BTC Wallet'
   const btcWalletOnClick = () => {
-    if (isBTCConnected()) {
+    if (isBTCConnected) {
       copyAddress(btcAddress)
     } else {
       setIsBTCWalletModalOpen(true)
     }
   }
+
   const ethereumWalletText = ethereumAddress
     ? `${formatAddress(ethereumAddress)} | ${ebtc} eBTC`
     : 'Connect Ethereum Wallet'

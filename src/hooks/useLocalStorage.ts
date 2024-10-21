@@ -29,10 +29,10 @@ function setItem<T>(key: string, value: T) {
 
 export function useLocalStorage<T>(key: string, inititalValue: T) {
   const isMounted = useRef(false)
-  const [value, setValue] = useState(() => getItem(key, inititalValue))
+  const [value, setValue] = useState<T>(() => getItem<T>(key, inititalValue))
 
   useEffect(() => {
-    setValue(getItem(key, inititalValue))
+    setValue(getItem<T>(key, inititalValue))
     return () => {
       isMounted.current = false
     }
