@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react'
 import { SettingsProvider } from './settings/provider'
 import { mainnet } from 'wagmi/chains'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
 interface Props {
   children: ReactNode
@@ -20,9 +20,7 @@ export function Providers(props: Props) {
   return (
     <SettingsProvider>
       <WagmiProvider config={config}>
-        <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider>{props.children}</RainbowKitProvider>
-        </QueryClientProvider>
+        <QueryClientProvider client={queryClient}>{props.children}</QueryClientProvider>
       </WagmiProvider>
     </SettingsProvider>
   )

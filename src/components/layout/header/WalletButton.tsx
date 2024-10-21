@@ -6,14 +6,15 @@ import { Dot } from '../../icons'
 
 interface Props {
   text: string
+  onClick?: () => void
   className?: string
 }
 
 const mono = Roboto_Mono({ subsets: ['latin'] })
 
-export function WalletButton({ text, className }: Props) {
+export function WalletButton({ text, onClick, className }: Props) {
   return (
-    <Container className={className}>
+    <Container className={className} onClick={onClick}>
       <Button className={mono.className}>
         <DotIcon />
         {text}

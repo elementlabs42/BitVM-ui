@@ -14,6 +14,7 @@ export function useBTCConnector() {
   )
 
   const selectUnisat = async () => {
+    console.log('>>>>>>>>>>>')
     setSelectedProvider(BTCConnectorType.UNISAT)
     try {
       await unisatConnection.connect()
