@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AppBtc, connect, getWalletAddress } from '../utils/ledger'
+import { AppBtc, connect, getWalletAddress } from '../../utils/ledger'
 import axios from 'axios'
 import { message } from 'antd'
 import { getErrorOnly } from '@/utils'

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { message } from 'antd'
 import { ChainType } from '@/constants/unisat'
-import { useLocalStorage } from './useLocalStorage'
+import { useLocalStorage } from '../useLocalStorage'
 import { getErrorOnly } from '@/utils'
 
 export const useUnisatConnection = () => {

@@ -1,26 +1,28 @@
-import styled from 'styled-components'
-import { Navigation } from './header/Navigation'
-import { WalletButton } from './header/WalletButton'
 import { useState, useEffect } from 'react'
-import { copyToClipboard, formatAddress } from '@/utils/address'
-import useMessage from 'antd/es/message/useMessage'
+import styled from 'styled-components'
 import { useAccount as useEthereumAccount } from 'wagmi'
-import { useConnectModal } from '@rainbow-me/rainbowkit'
+import { useConnectModal as useEthereumConnectModal } from '@rainbow-me/rainbowkit'
+import { useQueryClient } from '@tanstack/react-query'
+
+import { Navigation, WalletButton } from './headers'
 import { WalletModalBtc } from '../controls'
+import { formatAddress } from '@/utils'
 import { useBtcConnector } from '@/providers/BtcConnector'
+import { useClipboard } from '@/hooks/useClipboard'
+import { useBalanceOf } from '@/hooks/ethereum'
+import { EBTC_ADDRESSES } from '@/constants/addresses'
 
 export function Header() {
-  const { isConnected: isBTCConnected, btcAddress, btcBalance } = useBtcConnector()
-  const { address: ethereumAddress } = useEthereumAccount()
-  const [messageApi, contextHolder] = useMessage()
-  const { openConnectModal } = useConnectModal()
   const [isBTCWalletModalOpen, setIsBTCWalletModalOpen] = useState(false)
-  const copyAddress = (address: string) => {
-    copyToClipboard(address)
-    messageApi.success('Address copied to clipboard')
-  }
+  const { isConnected: isBTCConnected, btcAddress, btcBalance } = useBtcConnector()
 
-  const ebtc = 0
+  const { openConnectModal } = useEthereumConnectModal()
+  const ethereumAccount = useEthereumAccount()
+  const queryClient = useQueryClient()
+  const eBtcAddress = EBTC_ADDRESSES[ethereumAccount.chainId ?? 0]
+  const [eBtcBalance, balanceOfQueryKey] = useBalanceOf(eBtcAddress)
+
+  const [copyAddress, contextHolder] = useClipboard('Address copied to clipboard')
 
   useEffect(() => {
     if (isBTCConnected) {
@@ -37,12 +39,13 @@ export function Header() {
     }
   }
 
-  const ethereumWalletText = ethereumAddress
-    ? `${formatAddress(ethereumAddress)} | ${ebtc} eBTC`
+  const ethereumWalletText = ethereumAccount.address
+    ? `${formatAddress(ethereumAccount.address)} | ${eBtcBalance} eBTC`
     : 'Connect Ethereum Wallet'
-  const ethereumWalletOnClick = () => {
-    if (ethereumAddress) {
-      copyAddress(ethereumAddress)
+  const ethereumWalletOnClick = async () => {
+    if (ethereumAccount.address) {
+      copyAddress(ethereumAccount.address)
+      await queryClient.invalidateQueries({ queryKey: balanceOfQueryKey })
     } else {
       openConnectModal?.()
     }

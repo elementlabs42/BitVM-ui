@@ -1,9 +1,7 @@
 import { BTCConnectorType } from '@/constants/connector'
 import { useIsClient } from '@/hooks/useIsClient'
-import { useLedgerConnection } from '@/hooks/useLedgerConnection'
+import { useLedgerConnection, useTrezorConnection, useUnisatConnection } from '@/hooks/bitcoin'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { useTrezorConnection } from '@/hooks/useTrezorConnection'
-import { useUnisatConnection } from '@/hooks/useUnisatConnection'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 type BtcConnectorData = {
