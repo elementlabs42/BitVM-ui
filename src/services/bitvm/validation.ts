@@ -1,6 +1,6 @@
 import { NextApiRequest } from 'next'
 import { BitvmService } from './bitvm'
-import { ethers } from 'ethers'
+import { isAddress } from 'viem'
 
 export function validateBitcoinPublicKey(req: NextApiRequest): string | undefined {
   if (
@@ -13,7 +13,7 @@ export function validateBitcoinPublicKey(req: NextApiRequest): string | undefine
 }
 
 export function validateEthereumAddress(req: NextApiRequest): string | undefined {
-  if (req.query.address && typeof req.query.address === 'string' && ethers.isAddress(req.query.address)) {
+  if (req.query.address && typeof req.query.address === 'string' && isAddress(req.query.address)) {
     return req.query.address
   }
 }

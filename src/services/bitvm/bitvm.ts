@@ -3,7 +3,7 @@ import p from 'path'
 import { spawnSync } from 'child_process'
 import { getErrorOnly } from '@/utils'
 import * as bitcoin from 'bitcoinjs-lib'
-import * as ethers from 'ethers'
+import { isAddress } from 'viem'
 import { BitvmReponseStatus, Command, Env, Graph, GraphType, Tx, TxStatus, TxType } from '@/types'
 
 const DEFAULT_PATH = 'bitvm/'
@@ -26,7 +26,7 @@ export class BitvmService {
     if (!BitvmService.validateBitcoinPublicKey(publicKey)) {
       throw new Error('Invalid bitcoin public key')
     }
-    if (!ethers.isAddress(address)) {
+    if (!isAddress(address)) {
       throw new Error('Invalid ethereum address')
     }
     return this.call(Command.HISTORY, [publicKey, address])
@@ -40,7 +40,7 @@ export class BitvmService {
   }
 
   getWithdrawerStatus(address: string) {
-    if (!ethers.isAddress(address)) {
+    if (!isAddress(address)) {
       throw new Error('Invalid ethereum address')
     }
     return this.call(Command.WITHDRAWER, [address])
