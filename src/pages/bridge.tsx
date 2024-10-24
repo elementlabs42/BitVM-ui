@@ -1,9 +1,12 @@
+import styled from 'styled-components'
+import { ReactNode, useEffect, useState } from 'react'
 import {
   Label,
   RoundedElement,
   RoundedIcon,
   SelectInput,
   TextInput,
+  TextInputInfo,
   TextInputWithAction,
   Warning,
 } from '@/components/controls'
@@ -12,9 +15,8 @@ import { Bitcoin, Swap } from '@/components/icons'
 import { Page, Panel } from '@/components/layout'
 import { BTCConnectorType } from '@/constants/connector'
 import { useBtcConnector } from '@/providers/BtcConnector'
-import { empty, parseAddressType } from '@/utils'
-import { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import { empty, formatBtc, formatInput, isPow2, parseAddressType, parseBtc, prevPow2 } from '@/utils'
+import { isAddress } from 'viem'
 
 export default function Bridge() {
   const [formValid, setFormValid] = useState(false)
@@ -23,6 +25,11 @@ export default function Bridge() {
   const [selectValid, setSelectValid] = useState(false)
   const { selectedProvider, isConnected, btcAddress, btcBalance } = useBtcConnector()
   const [addressType, setAddressType] = useState('')
+
+  const [amountField, setAmountField] = useState('')
+  const [amountWarning, setAmountWarning] = useState<ReactNode>()
+  const [addressField, setAddressField] = useState('')
+  const [addressWarning, setAddressWarning] = useState<ReactNode>()
 
   useEffect(() => {
     let valid = amountValid && addressValid && isConnected
@@ -44,14 +51,12 @@ export default function Bridge() {
     setAddressType(parseAddressType(btcAddress).address)
   }, [btcAddress])
 
-  const selectLabel = <Label text={'You Supply'} withHelp={true} />
-  const warningLabel = <Warning text={'The satoshi equivalent of the number is a power of 2'} withHelp={true} />
   const accountInfo = () => {
     if (isConnected) {
       switch (selectedProvider) {
         case BTCConnectorType.UNISAT:
           return (
-            <TextInput
+            <TextInputInfo
               label={<Label text={'Bitcoin account'} />}
               value={
                 <Account>
@@ -60,7 +65,6 @@ export default function Bridge() {
                   <AccountAddress>{btcAddress}</AccountAddress>
                 </Account>
               }
-              disabled={true}
             />
           )
         case BTCConnectorType.LEDGER:
@@ -89,6 +93,22 @@ export default function Bridge() {
     }
     return <Warning text={'Please connect a BTC wallet'} />
   }
+
+  const inputLabel = <Label text={'You Supply'} withHelp={true} />
+  const warningLabel = (text: string) => <Warning text={text} withHelp={true} />
+  const validateBtcInput = (t: string): boolean => {
+    const parsedBtc = parseBtc(t)
+    const valid = parsedBtc ? isPow2(parsedBtc) : false
+    setAmountWarning(!valid ? warningLabel('The satoshi equivalent of the number is a power of 2') : undefined)
+    setAmountValid(valid)
+
+    const correction = empty(t) ? '' : formatInput(t)
+    if (correction !== undefined) {
+      setAmountField(correction)
+    }
+    return valid
+  }
+
   return (
     <Page>
       <Title>Confirm amount</Title>
@@ -100,26 +120,32 @@ export default function Bridge() {
           <Supplementary>Supply BTC to send eBTC to your Ethereum wallet</Supplementary>
           {accountInfo()}
           <TextInputWithAction
-            label={selectLabel}
+            label={inputLabel}
+            warning={amountWarning}
+            value={amountField}
             placeHolder="0.0"
-            validate={(t) => {
-              const result = !empty(t) ? t === 'aaa' : false
-              setAmountValid(result)
-              return result
-            }}
-            warning={warningLabel}
+            validate={validateBtcInput}
             inputIcon={<Bitcoin />}
-            action="MAX"
-            onAction={(input) => input.current && (input.current.value = 'suggested value')}
+            actionName="MAX"
+            onAction={(input) => {
+              if (input.current) {
+                const pow2 = formatBtc(prevPow2(btcBalance))
+                input.current.value = pow2
+                validateBtcInput(pow2)
+              }
+            }}
           />
           <TextInput
             label={<Label text={'Recipient address'} />}
+            warning={addressWarning}
+            value={addressField}
             validate={(t) => {
-              const result = !empty(t) ? t === 'aaa' : false
-              setAddressValid(result)
-              return result
+              const valid = isAddress(t)
+              setAddressField(t)
+              setAddressValid(valid)
+              setAddressWarning(!valid ? warningLabel('Incorrect Ethereum address format') : undefined)
+              return valid
             }}
-            warning={<Warning text={'Incorrect Ethereum address format'} />}
           />
           <Supplementaries>
             <Supplementary>

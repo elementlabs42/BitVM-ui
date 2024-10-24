@@ -8,7 +8,7 @@ type BtcConnectorData = {
   selectedProvider: BTCConnectorType
   isConnected: boolean
   btcAddress: string
-  btcBalance: string | number
+  btcBalance: bigint
   connectLedger: () => void
   connectTrezor: () => void
   connectUnisat: () => void
@@ -18,7 +18,7 @@ const DEFAULT: BtcConnectorData = {
   selectedProvider: BTCConnectorType.NONE,
   isConnected: false,
   btcAddress: '',
-  btcBalance: 0,
+  btcBalance: 0n,
   connectLedger: () => {},
   connectTrezor: () => {},
   connectUnisat: () => {},
@@ -37,7 +37,7 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
   )
 
   const [btcAddress, setBTCAddress] = useState<string>('')
-  const [btcBalance, setBTCBalance] = useState<string | number>(0)
+  const [btcBalance, setBTCBalance] = useState<bigint>(0n)
   const isConnected = useMemo<boolean>(() => {
     if (isClient && selectedProvider === BTCConnectorType.UNISAT) {
       return unisatConnection.unisatConnected
@@ -85,11 +85,11 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
 
   const getBalance = useCallback(async () => {
     if (selectedProvider === BTCConnectorType.UNISAT) {
-      return unisatConnection.balance.total
+      return BigInt(unisatConnection.balance.total)
     } else if (selectedProvider === BTCConnectorType.TREZOR) {
-      return trezorConnection.balance
+      return BigInt(trezorConnection.balance)
     } else if (selectedProvider === BTCConnectorType.LEDGER) {
-      return ledgerConnection.balance
+      return BigInt(ledgerConnection.balance)
     }
   }, [selectedProvider, unisatConnection, trezorConnection, ledgerConnection])
 
@@ -126,7 +126,7 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
     ;(async () => {
       if (isConnected) {
         setBTCAddress((await getAddress()) ?? '')
-        setBTCBalance((await getBalance()) ?? 0)
+        setBTCBalance((await getBalance()) ?? 0n)
       }
     })()
   }, [isConnected, getAddress, getBalance])

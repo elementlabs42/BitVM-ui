@@ -1,16 +1,14 @@
 import styled from 'styled-components'
-import { ReactElement, ReactNode, useEffect, useRef, useState } from 'react'
-import { useDebounce } from '@/hooks/useDebounce'
+import { ReactElement, ReactNode, useRef } from 'react'
 import { IconProps } from '../icons/_base'
 import { RoundedElement } from './Rounded'
 import { InputBoxStyle, InputContainer, InputIcon, InputStyle, withLabel } from './common'
-import { empty } from '@/utils'
 
 interface Props {
   label: ReactNode
   validate?: (content: string) => boolean
-  value?: string | ReactElement
   warning?: ReactNode
+  value?: string
   disabled?: boolean
   placeHolder?: string
   inputIcon?: ReactElement<IconProps>
@@ -19,42 +17,48 @@ interface Props {
   inputRef?: React.RefObject<HTMLInputElement>
 }
 
+interface InfoProps extends Omit<Props, 'value'> {
+  value: ReactElement
+}
+
 interface ActionProps extends Omit<Props, 'action'> {
-  action: string
+  actionName: string
   onAction?: (ref: React.RefObject<HTMLInputElement>) => void
 }
 
-const VALIDATION_DELAY = 500
+export function TextInputInfo({ label, value, className }: InfoProps) {
+  const input = (
+    <InputContainer className={className}>
+      <InputBox>{value}</InputBox>
+    </InputContainer>
+  )
+  return withLabel({ label, input, className })
+}
 
 export function TextInputWithAction({
   label,
   validate,
-  value,
   warning,
+  value,
   disabled,
   placeHolder = '',
   inputIcon,
-  action,
+  actionName,
   onAction,
   className,
 }: ActionProps) {
   const inputRef = useRef<HTMLInputElement>(null)
-  const onClick = () => {
-    if (inputRef.current && onAction) {
-      onAction(inputRef)
-    }
-  }
   const actionNode = (
     <InputAction>
-      <InputButton onClick={onAction && onClick}>{action}</InputButton>
+      <InputButton onClick={() => inputRef.current && onAction && onAction(inputRef)}>{actionName}</InputButton>
     </InputAction>
   )
   return (
     <TextInput
       label={label}
       validate={validate}
-      value={value}
       warning={warning}
+      value={value}
       disabled={disabled}
       placeHolder={placeHolder}
       inputIcon={inputIcon}
@@ -79,8 +83,8 @@ const InputButton = styled(RoundedElement)`
 export function TextInput({
   label,
   validate,
-  value,
   warning,
+  value,
   disabled,
   placeHolder = '',
   inputIcon,
@@ -88,38 +92,21 @@ export function TextInput({
   className,
   inputRef,
 }: Props) {
-  const [valid, setValid] = useState(true)
-  const [onceChecked, setOnceChecked] = useState(false)
-  const [text, setText] = useState('')
-  const debouncedText = useDebounce(text, VALIDATION_DELAY)
-  const debouncedOnceChecked = useDebounce(onceChecked, VALIDATION_DELAY)
-
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setText(e.target.value)
-    setOnceChecked(true)
-  }
-
-  useEffect(() => {
-    if (validate && (debouncedOnceChecked || !empty(debouncedText))) {
-      setValid(validate(debouncedText))
-    } else {
-      setValid(true)
-    }
-  }, [debouncedOnceChecked, debouncedText, validate])
-
   const input = (
-    <InputContainer>
+    <InputContainer className={className}>
       {inputIcon && <InputIcon>{inputIcon}</InputIcon>}
-      {!value || (value && typeof value === 'string') ? (
-        <Input placeholder={placeHolder} onChange={onChange} ref={inputRef} disabled={disabled} value={value} />
-      ) : (
-        <InputBox>{value}</InputBox>
-      )}
+      <Input
+        placeholder={placeHolder}
+        onChange={(e) => validate && validate(e.target.value)}
+        ref={inputRef}
+        disabled={disabled}
+        value={value}
+      />
       {action && action}
     </InputContainer>
   )
 
-  return withLabel({ label, valid, warning, input, className })
+  return withLabel({ label, warning, input, className })
 }
 
 const InputBox = styled.div`

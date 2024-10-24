@@ -3,18 +3,17 @@ import { ReactNode } from 'react'
 
 interface Props {
   label: ReactNode
-  valid?: boolean
   warning?: ReactNode
   input: ReactNode
   className?: string
 }
 
-export function withLabel({ label, valid = true, warning, input, className }: Props) {
+export function withLabel({ label, warning, input, className }: Props) {
   return (
     <Container className={className}>
       <Wrapper>{label}</Wrapper>
       {input}
-      {warning && !valid && <Wrapper>{warning}</Wrapper>}
+      {warning && <Wrapper>{warning}</Wrapper>}
     </Container>
   )
 }
