@@ -21,9 +21,12 @@ interface InfoProps extends Omit<Props, 'value'> {
   value: ReactElement
 }
 
+type Action = {
+  name: string
+  onAction: (ref: React.RefObject<HTMLInputElement>) => void
+}
 interface ActionProps extends Omit<Props, 'action'> {
-  actionName: string
-  onAction?: (ref: React.RefObject<HTMLInputElement>) => void
+  actions: Action[]
 }
 
 export function TextInputInfo({ label, value, className }: InfoProps) {
@@ -43,14 +46,17 @@ export function TextInputWithAction({
   disabled,
   placeHolder = '',
   inputIcon,
-  actionName,
-  onAction,
+  actions,
   className,
 }: ActionProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const actionNode = (
     <InputAction>
-      <InputButton onClick={() => inputRef.current && onAction && onAction(inputRef)}>{actionName}</InputButton>
+      {actions.map(({ name: actionName, onAction }, i) => (
+        <InputButton key={i} onClick={() => inputRef.current && onAction && onAction(inputRef)}>
+          {actionName}
+        </InputButton>
+      ))}
     </InputAction>
   )
   return (
@@ -71,6 +77,9 @@ export function TextInputWithAction({
 
 const InputAction = styled.div`
   margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `
 
 const InputButton = styled(RoundedElement)`

@@ -98,8 +98,21 @@ export default function Bridge() {
   const warningLabel = (text: string) => <Warning text={text} withHelp={true} />
   const validateBtcInput = (t: string): boolean => {
     const parsedBtc = parseBtc(t)
-    const valid = parsedBtc ? isPow2(parsedBtc) : false
-    setAmountWarning(!valid ? warningLabel('The satoshi equivalent of the number is a power of 2') : undefined)
+    const valid = ((parsedBtc) => {
+      if (parsedBtc) {
+        if (parsedBtc > btcBalance) {
+          console.log('larger than balance', parsedBtc, btcBalance, t)
+          setAmountWarning(warningLabel('The satoshi equivalent of the number is larger than account balance'))
+          return false
+        } else if (!isPow2(parsedBtc)) {
+          console.log('is pow2', parsedBtc, t)
+          setAmountWarning(warningLabel('The satoshi equivalent of the number is a power of 2'))
+          return false
+        }
+      }
+      setAmountWarning(undefined)
+      return true
+    })(parsedBtc)
     setAmountValid(valid)
 
     const correction = empty(t) ? '' : formatInput(t)
@@ -126,14 +139,32 @@ export default function Bridge() {
             placeHolder="0.0"
             validate={validateBtcInput}
             inputIcon={<Bitcoin />}
-            actionName="MAX"
-            onAction={(input) => {
-              if (input.current) {
-                const pow2 = formatBtc(prevPow2(btcBalance))
-                input.current.value = pow2
-                validateBtcInput(pow2)
-              }
-            }}
+            actions={[
+              {
+                name: 'POW2',
+                onAction: (input) => {
+                  if (input.current) {
+                    const parsedBtc = parseBtc(input.current.value)
+                    if (parsedBtc) {
+                      const near = formatBtc(prevPow2(parsedBtc))
+                      input.current.value = near
+                      validateBtcInput(near)
+                    }
+                  }
+                },
+              },
+              {
+                name: 'MAX',
+                onAction: (input) => {
+                  if (input.current) {
+                    const pow2 = formatBtc(prevPow2(btcBalance))
+                    console.log('maxed', pow2)
+                    input.current.value = pow2
+                    validateBtcInput(pow2)
+                  }
+                },
+              },
+            ]}
           />
           <TextInput
             label={<Label text={'Recipient address'} />}
@@ -158,11 +189,11 @@ export default function Bridge() {
             </Supplementary>
             <Supplementary>
               <span>You receive:</span>
-              <span>100 eBTC</span>
+              <span>{empty(amountField) ? '0' : amountField} eBTC</span>
             </Supplementary>
             <Supplementary>
               <span>Refund address:</span>
-              <span>tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v</span>
+              <span>{isConnected && btcAddress ? btcAddress : 'N/A'}</span>
             </Supplementary>
           </Supplementaries>
         </FormPanel>
