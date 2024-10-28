@@ -1,10 +1,9 @@
 import styled from 'styled-components'
 import { Children, ReactNode, useEffect, useRef, useState } from 'react'
-import { InputContainer, InputStyle, withLabel } from './common'
+import { InputContainer, InputStyle, withLabel, Hidden, HIDDEN_Z_INDEX } from './common'
 import { RoundedIcon, Warning } from '.'
 import { ChevronDown } from '../icons'
 import { Borders } from '@/constants/themes'
-import { Hidden } from './Hidden'
 import { Checked } from '../icons/history'
 
 interface Props {
@@ -157,7 +156,7 @@ const Items = styled.div`
     transform ${FADE_OUT_DURATION}ms ease-out;
   background-color: ${({ theme }) => theme.Background};
   width: 100%;
-  z-index: 20;
+  z-index: ${HIDDEN_Z_INDEX + 1};
 `
 
 const ItemContent = styled.div`
@@ -171,7 +170,7 @@ const ItemContent = styled.div`
     0px 20px 24px -4px ${({ theme }) => theme.ShadowInner},
     0px 8px 8px -4px ${({ theme }) => theme.ShadowOuter};
   > * {
-    z-index: 20;
+    z-index: ${HIDDEN_Z_INDEX + 1};
     overflow: hidden;
     padding: 0.5em 1em;
     cursor: pointer;

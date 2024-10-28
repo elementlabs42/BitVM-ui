@@ -1,56 +1,72 @@
-import styled from 'styled-components'
-import { Navigation } from './header/Navigation'
-import { WalletButton } from './header/WalletButton'
-import { useBTCConnector } from '@/hooks/useBTCConnector'
 import { useState, useEffect } from 'react'
-import { copyToClipboard, formatAddress, formatBalance } from '@/utils/address'
-import useMessage from 'antd/es/message/useMessage'
-import { useAccount } from 'wagmi'
+import styled from 'styled-components'
+import { useAccount as useEthereumAccount } from 'wagmi'
+import { useConnectModal as useEthereumConnectModal } from '@rainbow-me/rainbowkit'
+import { useQueryClient } from '@tanstack/react-query'
+
+import { Navigation, WalletButton } from './headers'
+import { WalletModalBtc } from '../controls'
+import { formatAddress } from '@/utils'
+import { useBtcConnector } from '@/providers/BtcConnector'
+import { useClipboard } from '@/hooks/useClipboard'
+import { useBalanceOf } from '@/hooks/ethereum'
+import { EBTC_ADDRESSES } from '@/constants/addresses'
 
 export function Header() {
-  const [isClient, setIsClient] = useState(false)
-  const [btcBalance, setBTCBalance] = useState<string | number>(0)
-  const [btcAddress, setBTCAddress] = useState<string>('')
-  const { isConnected: isBTCConnected, getAddress: getBTCAddress, getBalance: getBTCBalance } = useBTCConnector()
-  const { address } = useAccount()
-  const [messageApi, contextHolder] = useMessage()
+  const [isBTCWalletModalOpen, setIsBTCWalletModalOpen] = useState(false)
+  const { isConnected: isBTCConnected, btcAddress, btcBalance } = useBtcConnector()
+
+  const { openConnectModal } = useEthereumConnectModal()
+  const ethereumAccount = useEthereumAccount()
+  const queryClient = useQueryClient()
+  const eBtcAddress = EBTC_ADDRESSES[ethereumAccount.chainId ?? 0]
+  const [eBtcBalance, balanceOfQueryKey] = useBalanceOf(eBtcAddress)
+
+  const [copyAddress, contextHolder] = useClipboard('Address copied to clipboard')
 
   useEffect(() => {
+    if (isBTCConnected) {
+      setIsBTCWalletModalOpen(false)
+    }
+  }, [isBTCConnected])
 
-  }, [isBTCConnected, getBTCAddress, getBTCBalance])
-
-  const copyAddress = (address: string) => {
-    copyToClipboard(address)
-    messageApi.success('Address copied to clipboard')
+  const btcWalletText = isBTCConnected ? `${formatAddress(btcAddress)} | ${btcBalance} sat` : 'Connect BTC Wallet'
+  const btcWalletOnClick = () => {
+    if (isBTCConnected) {
+      copyAddress(btcAddress)
+    } else {
+      setIsBTCWalletModalOpen(true)
+    }
   }
 
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
+  const ethereumWalletText = ethereumAccount.address
+    ? `${formatAddress(ethereumAccount.address)} | ${eBtcBalance} eBTC`
+    : 'Connect Ethereum Wallet'
+  const ethereumWalletOnClick = async () => {
+    if (ethereumAccount.address) {
+      copyAddress(ethereumAccount.address)
+      await queryClient.invalidateQueries({ queryKey: balanceOfQueryKey })
+    } else {
+      openConnectModal?.()
+    }
+  }
 
-  const ebtc = 0
+  const btcWalletModal = (
+    <WalletModalBtc
+      onClosed={() => {
+        setIsBTCWalletModalOpen(false)
+      }}
+    />
+  )
 
   return (
     <Container>
       <Navigation />
+      {isBTCWalletModalOpen && btcWalletModal}
       {contextHolder}
       <WalletContainer>
-        <div
-          onClick={() => {
-            copyAddress(btcAddress ?? '')
-          }}
-        >
-          {isBTCConnected() && isClient && (
-            <Wallet text={`${formatAddress(btcAddress)} | ${formatBalance(btcBalance.toString(), 8)} BTC`} />
-          )}
-        </div>
-        <div
-          onClick={() => {
-            copyAddress(address ?? '')
-          }}
-        >
-          {address && isClient && <Wallet text={`${formatAddress(address)} | ${formatBalance(ebtc.toString(), 18)} eBTC`} />}
-        </div>
+        <Wallet text={btcWalletText} onClick={btcWalletOnClick} />
+        <Wallet text={ethereumWalletText} onClick={ethereumWalletOnClick} />
       </WalletContainer>
     </Container>
   )

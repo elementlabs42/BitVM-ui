@@ -6,14 +6,16 @@ export type ValidationResult<Args> = {
   args?: Args
 }
 
-function getMethodOnly(req: NextApiRequest) {
+function validateMethods(req: NextApiRequest) {
   if (req.method !== 'GET') {
-    return { status: 405, error: 'Method not allowed' }
+    if (!req.url?.startsWith('/api/signatures')) {
+      return { status: 405, error: 'Method not allowed' }
+    }
   }
 }
 
 export function validate<Args>(req: NextApiRequest, customValidate?: (req: NextApiRequest) => ValidationResult<Args>) {
-  const methodResult = getMethodOnly(req)
+  const methodResult = validateMethods(req)
   if (methodResult) {
     return methodResult as ValidationResult<Args>
   }

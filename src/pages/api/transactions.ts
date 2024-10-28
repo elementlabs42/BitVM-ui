@@ -1,34 +1,34 @@
 import { BitvmService } from '@/services/bitvm/bitvm'
-import { BitvmReponseStatus, BitvmResponse, Env } from '@/types'
+import { BitvmReponseStatus, BitvmResponse, Env, TransactionsArgs } from '@/types'
 import { validate, ValidationResult } from '@/services/validation'
 import { getErrorOnly } from '@/utils'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { validateBitcoinPublicKey, validateEthereumAddress } from '@/services/bitvm/validation'
-
-type HistoryArgs = {
-  pubkey: string
-  address: string
-}
+import {
+  validateBitcoinPublicKey,
+  validateEthereumAddress,
+  validateOutpoint,
+  validateSatoshis,
+} from '@/services/bitvm/validation'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<BitvmResponse | string>) {
   const validation = validate(req, validateHistory)
   if (validation.status === 200 && validation.args) {
     const bitvm = new BitvmService(Env.TESTNET)
-    const result = getHistory(bitvm, validation.args.pubkey, validation.args.address)
+    const result = getTransactions(bitvm, validation.args)
     res.status(result.status === 'OK' ? 200 : 500).json(result)
   } else {
     res.status(validation.status).send(validation.error ?? 'Unknown error')
   }
 }
 
-function validateHistory(req: NextApiRequest): ValidationResult<HistoryArgs> {
-  const result: ValidationResult<HistoryArgs> = { status: 200 }
+function validateHistory(req: NextApiRequest): ValidationResult<TransactionsArgs> {
+  const result: ValidationResult<TransactionsArgs> = { status: 200 }
 
   const pubkey = validateBitcoinPublicKey(req)
   if (!pubkey) {
     return { status: 400, error: 'Invalid bitcoin public key' }
   } else {
-    result.args = { pubkey, address: '' }
+    result.args = { pubkey, address: '', outpoint: '', sat: 0n }
   }
 
   const address = validateEthereumAddress(req)
@@ -38,12 +38,26 @@ function validateHistory(req: NextApiRequest): ValidationResult<HistoryArgs> {
     result.args = { ...result.args, address }
   }
 
+  const outpoint = validateOutpoint(req)
+  if (!outpoint) {
+    return { status: 400, error: 'Invalid Outpoint' }
+  } else {
+    result.args = { ...result.args, outpoint }
+  }
+
+  const sat = validateSatoshis(req)
+  if (!sat) {
+    return { status: 400, error: 'Invalid Satoshis' }
+  } else {
+    result.args = { ...result.args, sat }
+  }
+
   return result
 }
 
-function getHistory(client: BitvmService, pubkey: string, address: string): BitvmResponse {
+function getTransactions(client: BitvmService, args: TransactionsArgs): BitvmResponse {
   try {
-    return { status: BitvmReponseStatus.OK, data: client.getHistory(pubkey, address) }
+    return { status: BitvmReponseStatus.OK, data: client.getTransactions(args) }
   } catch (err) {
     const error = getErrorOnly(err).message
     return { status: BitvmReponseStatus.NOK, error }

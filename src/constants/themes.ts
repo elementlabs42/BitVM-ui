@@ -1,8 +1,10 @@
 export const Colors = {
-  Black: '#000',
+  Black: '#111',
   BlackTransparent: 'rgba(0, 0, 0, 0.6)',
+  BlackTransparentLess: 'rgba(0, 0, 0, 0.3)',
   White: '#FFFFFF',
   WhiteTransparent: 'rgba(255, 255, 255, 0.6)',
+  WhiteTransparentLess: 'rgba(0, 0, 0, 0.5)',
 
   Red: '#D92D20',
 
@@ -46,6 +48,10 @@ export const LightTheme = {
   ShadowInner: 'rgba(16, 24, 40, 0.08)',
   ShadowOuter: 'rgba(16, 24, 40, 0.03)',
 
+  ModalBorder: '#D0D5DD',
+  ModalBackgroundTransparent: Colors.BlackTransparentLess,
+  ModalShadow: 'rgba(16, 24, 40, 0.32)',
+
   AccordionDetailBorder: '#E4E7EC',
   AccordionDetailBackground: Colors.LightestGray,
 }
@@ -62,8 +68,8 @@ export const DarkTheme = {
   ButtonLightBg: Colors.White,
   ButtonLightText: Colors.Black,
 
-  PrimaryText: Colors.TextPrimary900,
-  SecondaryText: Colors.TextSecondary,
+  PrimaryText: Colors.White,
+  SecondaryText: Colors.White,
 
   Text: Colors.White,
   Warning: Colors.Red,
@@ -81,6 +87,10 @@ export const DarkTheme = {
   ShadowInner: 'rgba(229, 229, 229, 0.08)',
   ShadowOuter: 'rgba(229, 229, 229, 0.03)',
 
+  ModalBorder: 'rgba(224, 232, 255, 0.1)',
+  ModalBackgroundTransparent: Colors.WhiteTransparentLess,
+  ModalShadow: 'rgba(66, 66, 66, 0.32)',
+
   AccordionDetailBorder: Colors.Gray,
   AccordionDetailBackground: Colors.DarkestGray,
 }
@@ -96,4 +106,5 @@ export const Borders = {
   ButtonRadius: '6px',
   IconRadius: '8px',
   PanelRadius: '12px',
+  ModalRadius: '24px',
 }

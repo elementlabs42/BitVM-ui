@@ -1,4 +1,12 @@
-import * as bitcoin from 'bitcoinjs-lib';
+import { NetworkType } from '@/constants/unisat'
+
+export enum BTCAddressType {
+  LEGACY = 'Legacy (P2PKH)',
+  NESTED_SEGWIT = 'Nested SegWit (P2SH-P2WPKH)',
+  NATIVE_SEGWIT = 'Native SegWit (P2WPKH)',
+  TAPROOT = 'Taproot (P2TR)',
+  UNKNOWN = 'Unknown',
+}
 
 export function formatAddress(address: string, startLength = 6, endLength = 4) {
   if (!address) {
@@ -12,69 +20,24 @@ export function formatAddress(address: string, startLength = 6, endLength = 4) {
   return `${start}...${end}`
 }
 
-export const isPowerOfTwo = (n: number) => n > 0 && (n & (n - 1)) === 0;
-
-export const closestSmallerPowerOfTwo = (n: number) => {
-  if (n <= 1) {
-    return 0;
-  }
-
-  let power = 1;
-
-  while (power * 2 < n) {
-    power *= 2;
-  }
-
-  return power;
-}
-
-export const getBTCAddressType = (address: string) => {
-  try {
-    const decodedAddress = bitcoin.address.fromBase58Check(address);
-    const { version } = decodedAddress;
-
-    if (version === bitcoin.networks.bitcoin.pubKeyHash) {
-      return 'Legacy (P2PKH)'
-    } else if (version === bitcoin.networks.bitcoin.scriptHash) {
-      return 'Nested SegWit (P2SH)'
-    }
-  } catch (e) {
-    try {
-      const decodedBech32 = bitcoin.address.fromBech32(address);
-      if (decodedBech32.prefix === 'bc' || decodedBech32.prefix === 'tb') {
-        return 'Native SegWit (Bech32)';
-      }
-    } catch (e) {
-      return 'Unknown';
-    }
-  }
-  return 'Unknown';
-}
-
-export const formatBalance = (balance: string, decimals = 8) => {
-  if (parseFloat(balance) === 0) {
-    return '0'
-  }
-  return (Number(balance) / 10 ** decimals).toFixed(decimals)
-}
-
-export const copyToClipboard = (textToCopy: string | number) => {
-  if (navigator.clipboard && window.isSecureContext) {
-    return navigator.clipboard.writeText(textToCopy.toString())
+export function parseAddressType(address: string): { address: BTCAddressType; network: NetworkType } {
+  if (address.startsWith('1')) {
+    return { address: BTCAddressType.LEGACY, network: NetworkType.MAINNET }
+  } else if (address.startsWith('3')) {
+    return { address: BTCAddressType.NESTED_SEGWIT, network: NetworkType.MAINNET }
+  } else if (address.startsWith('bc1p')) {
+    return { address: BTCAddressType.TAPROOT, network: NetworkType.MAINNET }
+  } else if (address.startsWith('bc1')) {
+    return { address: BTCAddressType.NATIVE_SEGWIT, network: NetworkType.MAINNET }
+  } else if (address.startsWith('m') || address.startsWith('n')) {
+    return { address: BTCAddressType.LEGACY, network: NetworkType.TESTNET }
+  } else if (address.startsWith('2')) {
+    return { address: BTCAddressType.NESTED_SEGWIT, network: NetworkType.TESTNET }
+  } else if (address.startsWith('tb1p') || address.startsWith('bcrt1p')) {
+    return { address: BTCAddressType.TAPROOT, network: NetworkType.TESTNET }
+  } else if (address.startsWith('tb1') || address.startsWith('bcrt1')) {
+    return { address: BTCAddressType.NATIVE_SEGWIT, network: NetworkType.TESTNET }
   } else {
-    const textArea = document.createElement('textarea')
-    textArea.value = textToCopy.toString()
-    textArea.style.position = 'absolute'
-    textArea.style.opacity = '0'
-    textArea.style.left = '-999999px'
-    textArea.style.top = '-999999px'
-    document.body.appendChild(textArea)
-    textArea.focus()
-    textArea.select()
-    return new Promise<void>((res, rej) => {
-      /* eslint-disable-next-line @typescript-eslint/no-unused-expressions */
-      document.execCommand('copy') ? res() : rej()
-      textArea.remove()
-    })
+    return { address: BTCAddressType.UNKNOWN, network: NetworkType.MAINNET }
   }
 }

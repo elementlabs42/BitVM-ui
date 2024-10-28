@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Navigation } from './footer/Navigation'
+import { Navigation } from './footers/Navigation'
 
 export function Footer() {
   return (

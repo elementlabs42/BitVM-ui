@@ -4,21 +4,24 @@ import { Header } from './Header'
 import { Footer } from './Footer'
 import { useTheme } from '@/hooks/useTheme'
 import { GlobalStyle } from '@/providers/GlobalStyle'
+import { darkTheme, lightTheme, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 
 interface Props {
   children: ReactNode
 }
 
 export function Page({ children }: Props) {
-  const { theme } = useTheme()
+  const { theme, useLightTheme } = useTheme()
   return (
     <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <Container>
-        <Header />
-        <PageContent>{children}</PageContent>
-        <Footer />
-      </Container>
+      <RainbowKitProvider modalSize="compact" theme={useLightTheme ? lightTheme() : darkTheme()}>
+        <GlobalStyle />
+        <Container>
+          <Header />
+          <PageContent>{children}</PageContent>
+          <Footer />
+        </Container>
+      </RainbowKitProvider>
     </ThemeProvider>
   )
 }

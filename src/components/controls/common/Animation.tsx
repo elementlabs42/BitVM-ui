@@ -13,3 +13,26 @@ export const Pulse = css`
     }
   }
 `
+
+export const Riseup = css`
+  animation:
+    riseup0 350ms cubic-bezier(0.15, 1.15, 0.6, 1),
+    riseup1 150ms ease;
+  @keyframes riseup0 {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes riseup1 {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+`
