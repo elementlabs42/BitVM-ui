@@ -1,10 +1,11 @@
 import fs from 'fs'
 import p from 'path'
 import { spawnSync } from 'child_process'
-import { getErrorOnly } from '@/utils'
+import { empty, getErrorOnly } from '@/utils'
 import * as bitcoin from 'bitcoinjs-lib'
 import { isAddress } from 'viem'
-import { BitvmReponseStatus, Command, Env, Graph, GraphType, Tx, TxStatus, TxType } from '@/types'
+import { BitvmResponseData, Command, Env, Graph, GraphType, PegInPsbt, Tx, TxStatus, TxType } from '@/types'
+import { BitvmReponseStatus, SignaturesArgs, TransactionsArgs } from '@/types'
 
 const DEFAULT_PATH = 'bitvm/'
 const DEFAULT_EXEC = 'cli-query'
@@ -46,6 +47,32 @@ export class BitvmService {
     return this.call(Command.WITHDRAWER, [address])
   }
 
+  getTransactions(args: TransactionsArgs) {
+    if (!BitvmService.validateBitcoinPublicKey(args.pubkey)) {
+      throw new Error('Invalid bitcoin public key')
+    }
+    if (!isAddress(args.address)) {
+      throw new Error('Invalid ethereum address')
+    }
+    if (!BitvmService.validateOutpoint(args.outpoint)) {
+      throw new Error('Invalid Outpoint')
+    }
+    return this.call(Command.TRANSACTIONS, [...Object.values(args).map((x) => x.toString())])
+  }
+
+  postSignatures(args: SignaturesArgs) {
+    if (!BitvmService.validateBitcoinPublicKey(args.pubkey)) {
+      throw new Error('Invalid bitcoin public key')
+    }
+    if (!isAddress(args.address)) {
+      throw new Error('Invalid ethereum address')
+    }
+    if (!BitvmService.validateOutpoint(args.outpoint)) {
+      throw new Error('Invalid Outpoint')
+    }
+    return this.call(Command.SIGNATURES, [...Object.values(args).map((x) => x.toString())])
+  }
+
   static validateCommand(input: string) {
     return Object.values(Command).find((cmd) => cmd.toString() === input.toLowerCase())
   }
@@ -55,14 +82,19 @@ export class BitvmService {
     return publicKeyBytes.toString('hex') === publicKeyHex && bitcoin.script.isCanonicalPubKey(publicKeyBytes)
   }
 
-  private call(subCommand: Command, args: string[]): Graph[] {
+  static validateOutpoint(outpoint: string) {
+    const [txid, vout] = outpoint.split(':')
+    return outpoint.length <= 75 && txid && txid.length === 64 && vout && !empty(vout)
+  }
+
+  private call(subCommand: Command, args: string[]): BitvmResponseData {
     const exec = `${this.path}${this.exec}`
     const options = `-e ${this.env} -p ${this.path}`.split(' ')
     const output = spawnSync(exec, [...options, subCommand, ...args], { cwd: this.path, stdio: [null, 'pipe', 'pipe'] })
-    return this.prepareResponse(output.stdout.toString())
+    return this.prepareResponse(subCommand, output.stdout.toString())
   }
 
-  private prepareResponse(output: string): Graph[] {
+  private prepareResponse(subCommand: Command, output: string): BitvmResponseData {
     const response = output.split(DEFAULT_DELIMITER_TOKEN)
     if (response.length === 2) {
       let obj = undefined
@@ -73,10 +105,17 @@ export class BitvmService {
         throw new Error(`Failed to parse response`)
       }
       if (obj.status === BitvmReponseStatus.OK) {
-        if (Array.isArray(obj.data)) {
-          return this.interperet(obj.data)
-        } else {
-          throw new Error('Invalid response, data is not vector')
+        switch (subCommand) {
+          case Command.TRANSACTIONS:
+            return this.interperetTransactions(obj.data)
+          case Command.SIGNATURES:
+            return ''
+          default:
+            if (Array.isArray(obj.data)) {
+              return this.interperetGraphs(obj.data)
+            } else {
+              throw new Error('Invalid response, data is not vector')
+            }
         }
       } else {
         throw new Error(`Upsteam error: ${obj.error}`)
@@ -86,7 +125,7 @@ export class BitvmService {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  private interperet(graphs: any[]): Graph[] {
+  private interperetGraphs(graphs: any[]): Graph[] {
     return graphs.map((g) => {
       const txs: Tx[] = Array.isArray(g.txs)
         ? g.txs.map((t: any) => {
@@ -113,6 +152,14 @@ export class BitvmService {
       }
       return graph
     })
+  }
+
+  private interperetTransactions(data: any): PegInPsbt {
+    return {
+      deposit: data.deposit,
+      confirm: data.confirm,
+      refund: data.refund,
+    }
   }
 
   private validateClient() {

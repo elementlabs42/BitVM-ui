@@ -7,6 +7,22 @@ export enum Command {
   DEPOSITOR = 'depositor',
   WITHDRAWER = 'withdrawer',
   HISTORY = 'history',
+  TRANSACTIONS = 'transactions',
+  SIGNATURES = 'signatures',
+}
+
+export type TransactionsArgs = {
+  pubkey: string
+  address: string
+  outpoint: string
+  sat: bigint
+}
+
+export type SignaturesArgs = TransactionsArgs & Signatures
+export type Signatures = {
+  deposit: string
+  confirm: string
+  refund: string
 }
 
 export enum BitvmReponseStatus {
@@ -14,9 +30,10 @@ export enum BitvmReponseStatus {
   NOK = 'NOK',
 }
 
+export type BitvmResponseData = Graph[] | PegInPsbt | string
 export type BitvmResponse = {
   status: BitvmReponseStatus
-  data?: Graph[]
+  data?: BitvmResponseData
   error?: string
 }
 
@@ -39,6 +56,13 @@ export type Tx = {
   type: TxType
   txId: string
   status: TxStatus
+}
+
+// TODO refactor with real psbt format
+export type PegInPsbt = {
+  deposit: string
+  confirm: string
+  refund: string
 }
 
 export enum GraphType {

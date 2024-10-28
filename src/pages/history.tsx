@@ -8,20 +8,20 @@ import {
 import { Refresh } from '@/components/icons'
 import { Active, CircledChecked, PegIn, PegOut } from '@/components/icons/history'
 import { Page } from '@/components/layout'
-import { useBitvm } from '@/hooks/useBitvm'
+import { useBitvmQuery } from '@/hooks/useBitvm'
 import { GraphType, TxType } from '@/types'
 import styled from 'styled-components'
 
 export default function History() {
-  const { response } = useBitvm()
+  const { response } = useBitvmQuery()
   return (
     <Page>
       <main>
         <Title>History</Title>
         <PaginationPanel>
           <AccordionGroup>
-            {response.data &&
-              response.data.map((graph, i) => (
+            {response &&
+              response.map((graph, i) => (
                 <Accordion key={i}>
                   <Graph icon={graph.type === GraphType.PEG_IN ? <PegIn /> : <PegOut />}>
                     <span>
