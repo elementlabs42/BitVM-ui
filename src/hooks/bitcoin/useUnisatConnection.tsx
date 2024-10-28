@@ -30,15 +30,14 @@ export const useUnisatConnection = () => {
     const psbtResult = await (window as any).unisat.signPsbt(psbtHex, {
       autoFinalized: true,
       toSignInputs: signInputs,
-    });
+    })
     return psbtResult
   }
 
   const pushPsbt = async (psbtHex: string) => {
-    const psbtResult = await (window as any).unisat.pushPsbt(psbtHex);
+    const psbtResult = await (window as any).unisat.pushPsbt(psbtHex)
     return psbtResult
   }
-
 
   useEffect(() => {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */

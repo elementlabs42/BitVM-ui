@@ -9,6 +9,7 @@ type BtcConnectorData = {
   isConnected: boolean
   btcAddress: string
   btcBalance: bigint
+  signPsbt: (psbt: string, signInputs: { index: number; address: string }[]) => Promise<string>
   connectLedger: () => void
   connectTrezor: () => void
   connectUnisat: () => void
@@ -19,6 +20,7 @@ const DEFAULT: BtcConnectorData = {
   isConnected: false,
   btcAddress: '',
   btcBalance: 0n,
+  signPsbt: async () => '',
   connectLedger: () => {},
   connectTrezor: () => {},
   connectUnisat: () => {},
@@ -83,6 +85,15 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
     }
   }
 
+  const signPsbt = useCallback(
+    async (psbt: string, signInputs: { index: number; address: string }[]) => {
+      if (selectedProvider === BTCConnectorType.UNISAT) {
+        return unisatConnection.signPsbt(psbt, signInputs)
+      }
+    },
+    [unisatConnection],
+  )
+
   const getBalance = useCallback(async () => {
     if (selectedProvider === BTCConnectorType.UNISAT) {
       return BigInt(unisatConnection.balance.total)
@@ -133,7 +144,16 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
 
   return (
     <BtcConnectorContext.Provider
-      value={{ selectedProvider, btcAddress, btcBalance, isConnected, connectUnisat, connectTrezor, connectLedger }}
+      value={{
+        selectedProvider,
+        btcAddress,
+        btcBalance,
+        isConnected,
+        signPsbt,
+        connectUnisat,
+        connectTrezor,
+        connectLedger,
+      }}
     >
       {children}
     </BtcConnectorContext.Provider>

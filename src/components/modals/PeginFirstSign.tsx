@@ -41,18 +41,18 @@ export const PeginFirstSign = ({ isVisible, amount, destination, onBack, onConfi
             <CheckListItem>Destination: {destination}</CheckListItem>
           </CheckListItem>
         </CheckList>
-        <SubTitle>
-          If everything matches, please press Sign.
-        </SubTitle>
+        <SubTitle>If everything matches, please press Sign.</SubTitle>
         <ButtonContainer>
           <NextButton>
-            <ButtonText onClick={() => {
+            <ButtonText
+              onClick={() => {
+                alert('--')
 
-              alert("--")
-
-              onConfirm()
-
-            }}>Sign</ButtonText>
+                onConfirm()
+              }}
+            >
+              Sign
+            </ButtonText>
           </NextButton>
         </ButtonContainer>
       </ModalContainer>

@@ -15,24 +15,21 @@ import { Bitcoin, Swap } from '@/components/icons'
 import { Page, Panel } from '@/components/layout'
 import { BTCConnectorType } from '@/constants/connector'
 import { useBtcConnector } from '@/providers/BtcConnector'
-import { empty, formatAddress, formatBalance, formatBtc, formatInput, isPow2, parseAddressType, parseBtc, prevPow2 } from '@/utils'
+import { empty, formatAddress, formatBtc, formatInput, isPow2, parseAddressType, parseBtc, prevPow2 } from '@/utils'
 import { isAddress } from 'viem'
 import { PeginSignPreviewModal } from '@/components/modals/PeginSignPreviewModal'
 import { PeginFirstSign } from '@/components/modals/PeginFirstSign'
-import { message } from 'antd'
 import { useRouter } from 'next/router'
+import { finalizePsbtAndGetTxId } from '@/hooks/utils'
 
 export default function Bridge() {
   const router = useRouter()
-  const { isConnected: isBTCConnected, getAccounts: getBTCAccounts, getBalance: getBTCBalance, signPsbt: signBTCPSBT } = useBTCConnector()
-  const [accounts, setAccounts] = useState<string[]>([])
-  const [balance, setBalance] = useState<string[]>([])
 
   const [formValid, setFormValid] = useState(false)
   const [amountValid, setAmountValid] = useState(false)
   const [addressValid, setAddressValid] = useState(false)
   const [selectValid, setSelectValid] = useState(false)
-  const { selectedProvider, isConnected, btcAddress, btcBalance } = useBtcConnector()
+  const { selectedProvider, isConnected, btcAddress, btcBalance, signPsbt } = useBtcConnector()
   const [addressType, setAddressType] = useState('')
 
   const [amountField, setAmountField] = useState('')
@@ -40,26 +37,7 @@ export default function Bridge() {
   const [addressField, setAddressField] = useState('')
   const [addressWarning, setAddressWarning] = useState<ReactNode>()
 
-  const [isSignModalPreview, setIsSignModalPreview] = useState(true)
-  const [isFirstSign, setIsFirstSign] = useState(false)
-
-
-  useEffect(() => {
-    if (!isBTCConnected()) {
-      message.error('Please connect your BTC wallet first')
-    } else if (accounts.length === 0 || balance.length === 0) {
-      getBTCAccounts().then((res: any) => {
-        if (res && res.length > 0) {
-          setAccounts(res || [])
-        }
-      })
-      getBTCBalance().then((res: any) => {
-        if (res && res.toString() !== '0') {
-          setBalance(res ? [res.toString()] : [])
-        }
-      })
-    }
-  }, [isBTCConnected, accounts, balance])
+  const [signStep, setSignStep] = useState(0)
 
   useEffect(() => {
     let valid = amountValid && addressValid && isConnected
@@ -209,33 +187,35 @@ export default function Bridge() {
             }}
           />
           <PeginSignPreviewModal
-            isVisible={isSignModalPreview}
+            isVisible={signStep === 1}
             onBack={() => {
-              setIsSignModalPreview(false)
+              setSignStep(0)
             }}
             onConfirm={() => {
-              setIsSignModalPreview(false)
-              setIsFirstSign(true)
+              setSignStep(2)
             }}
           />
           <PeginFirstSign
-            isVisible={isFirstSign}
-            amount={formatBalance(balance[0])}
-            destination={formatAddress(accounts[0])}
+            isVisible={signStep === 2}
+            amount={btcBalance ? formatBtc(BigInt(amountField)) : '0'}
+            destination={addressField ? formatAddress(addressField) : ''}
             onBack={() => {
-              setIsFirstSign(false)
-              setIsSignModalPreview(true)
+              setSignStep(1)
             }}
-            onConfirm={() => {
-              signBTCPSBT("70736274ff01005e02000000010ae306c82a878f789780b096421b1ee1c11bf57a3b014925a80e6ff1a32ab78a0000000000ffffffff013800000000000000225120963b0923fd7a825e0333c4bf71c218a86f85504576ddb777f65d9c5a1e4587c000000000000100ea020000000001016e66e2d2e2b3c1dfc86294adf307615d48fc3715905bae26c718c198fe45d0380100000000ffffffff021029000000000000220020a1102d8c68b52d16532fa42737ebae6db487b7abbbe84cccc0328c19345ad91e7a740700000000001600147dd9efafecff9f8675c4a5a3cceef5b816241c3a0247304402201c042daaa0f8a92ef5124996d374b68439e232abf8efcf287a8b93b03bffc3f4022042d9b5163e74916a8d846299b029801f1837b445ec364290140955d8950ad8a4012102edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301b000000000105232102edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301bac0000",
+            onConfirm={async () => {
+              const res = await signPsbt(
+                '70736274ff01005e02000000010ae306c82a878f789780b096421b1ee1c11bf57a3b014925a80e6ff1a32ab78a0000000000ffffffff013800000000000000225120963b0923fd7a825e0333c4bf71c218a86f85504576ddb777f65d9c5a1e4587c000000000000100ea020000000001016e66e2d2e2b3c1dfc86294adf307615d48fc3715905bae26c718c198fe45d0380100000000ffffffff021029000000000000220020a1102d8c68b52d16532fa42737ebae6db487b7abbbe84cccc0328c19345ad91e7a740700000000001600147dd9efafecff9f8675c4a5a3cceef5b816241c3a0247304402201c042daaa0f8a92ef5124996d374b68439e232abf8efcf287a8b93b03bffc3f4022042d9b5163e74916a8d846299b029801f1837b445ec364290140955d8950ad8a4012102edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301b000000000105232102edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301bac0000',
                 [
                   {
                     index: 0,
-                    address: "tb1q0hv7ltlvl70cvawy5k3uemh4hqtzg8p663sv5d",
+                    address: 'tb1q0hv7ltlvl70cvawy5k3uemh4hqtzg8p663sv5d',
                   },
-                ]
+                ],
               )
-            }} />
+              const txId = finalizePsbtAndGetTxId(res)
+              console.log(txId)
+            }}
+          />
           <Supplementaries>
             <Supplementary>
               <span>Destination chain:</span>
@@ -256,11 +236,19 @@ export default function Bridge() {
           </Supplementaries>
         </FormPanel>
         <Buttons>
-          <Button onClick={() => {
-            router.push('/')
-          }}>Back</Button>
-          <Button onClick={() => {
-          }} active={formValid}>
+          <Button
+            onClick={() => {
+              router.push('/')
+            }}
+          >
+            Back
+          </Button>
+          <Button
+            onClick={() => {
+              setSignStep(1)
+            }}
+            active={formValid}
+          >
             Next
           </Button>
         </Buttons>

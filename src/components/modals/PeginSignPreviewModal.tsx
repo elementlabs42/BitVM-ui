@@ -23,8 +23,14 @@ export const PeginSignPreviewModal = ({ isVisible, onBack, onConfirm }: Props) =
         <AlertIcon />
         <Header>Next step: signing transactions</Header>
         <SubTitle>
-          <p>To proceed with bridging, you will need to sign 3 separate transactions. Please ensure that the amount, address, and transaction displayed on your wallet matches with the parameters shown on the screen.</p>
-          <p>Please note that once you start signing, the process is <b>irreversible</b>. To get your deposit back, you must complete the entire bridging process and redeem your eBTC back to BTC.</p>
+          <p>
+            To proceed with bridging, you will need to sign 3 separate transactions. Please ensure that the amount,
+            address, and transaction displayed on your wallet matches with the parameters shown on the screen.
+          </p>
+          <p>
+            Please note that once you start signing, the process is <b>irreversible</b>. To get your deposit back, you
+            must complete the entire bridging process and redeem your eBTC back to BTC.
+          </p>
         </SubTitle>
         <ButtonContainer>
           <BackButton>
@@ -89,7 +95,6 @@ const Logo = styled(UsbDrive)`
   width: 3rem;
   height: 3rem;
 `
-
 
 const ButtonContainer = styled.div`
   display: flex;
