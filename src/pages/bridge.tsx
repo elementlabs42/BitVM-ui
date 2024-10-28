@@ -10,15 +10,47 @@ import {
 import { BackgroundPattern } from '@/components/controls'
 import { Bitcoin, Swap } from '@/components/icons'
 import { Page, Panel } from '@/components/layout'
-import { empty } from '@/utils'
+import { PeginFirstSign } from '@/components/modals/PeginFirstSign'
+import { PeginSignPreviewModal } from '@/components/modals/PeginSignPreviewModal'
+import { useBTCConnector } from '@/hooks/useBTCConnector'
+import { closestSmallerPowerOfTwo, empty, formatAddress, formatBalance, getBTCAddressType, isPowerOfTwo } from '@/utils'
+import message from 'antd/es/message'
+import { ethers } from 'ethers'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 export default function Bridge() {
+  const router = useRouter()
+  const { isConnected: isBTCConnected, getAccounts: getBTCAccounts, getBalance: getBTCBalance, signPsbt: signBTCPSBT } = useBTCConnector()
+  const [accounts, setAccounts] = useState<string[]>([])
+  const [balance, setBalance] = useState<string[]>([])
+
   const [formValid, setFormValid] = useState(false)
   const [amountValid, setAmountValid] = useState(false)
   const [addressValid, setAddressValid] = useState(false)
   const [selectValid, setSelectValid] = useState(false)
+
+  const [isSignModalPreview, setIsSignModalPreview] = useState(true)
+  const [isFirstSign, setIsFirstSign] = useState(false)
+
+
+  useEffect(() => {
+    if (!isBTCConnected()) {
+      message.error('Please connect your BTC wallet first')
+    } else if (accounts.length === 0 || balance.length === 0) {
+      getBTCAccounts().then((res) => {
+        if (res && res.length > 0) {
+          setAccounts(res || [])
+        }
+      })
+      getBTCBalance().then((res) => {
+        if (res && res.toString() !== '0') {
+          setBalance(res ? [res.toString()] : [])
+        }
+      })
+    }
+  }, [isBTCConnected, accounts, balance])
 
   useEffect(() => {
     setFormValid(amountValid && addressValid && selectValid)
@@ -40,41 +72,65 @@ export default function Bridge() {
             notifyValidation={setSelectValid}
             placeHolder="Select Bitcoin account"
           >
-            <Account>
-              <AccountName>Legacy</AccountName>
-              <AccountAmount>1.19 BTC</AccountAmount>
-            </Account>
-            <Account>
-              <AccountName>SegWit</AccountName>
-              <AccountAmount>5.32 BTC</AccountAmount>
-            </Account>
-            <Account>
-              <AccountName>Native SegWit</AccountName>
-              <AccountAmount>5.32 BTC</AccountAmount>
-            </Account>
+            {accounts.map((account, index) => (
+              <Account key={index}>
+                <AccountName>{getBTCAddressType(account)}</AccountName>
+                <AccountAmount>{formatBalance(balance[index])} BTC</AccountAmount>
+              </Account>
+            ))}
           </SelectInput>
           <TextInputWithAction
             label={selectLabel}
             placeHolder="0.0"
             validate={(t) => {
-              const result = !empty(t) ? t === 'aaa' : false
+              const result = !empty(t) ? isPowerOfTwo(parseFloat(t)) : false
               setAmountValid(result)
               return result
             }}
             warning={warningLabel}
             inputIcon={<Bitcoin />}
             action="MAX"
-            onAction={(input) => input.current && (input.current.value = 'suggested value')}
+            onAction={(input) => {
+              input.current && (input.current.value = formatBalance(closestSmallerPowerOfTwo(parseInt(balance[0])).toString()))
+            }}
           />
           <TextInput
             label={<Label text={'Recipient address'} />}
             validate={(t) => {
-              const result = !empty(t) ? t === 'aaa' : false
+              const result = !empty(t) ? ethers.isAddress(t) : false
               setAddressValid(result)
               return result
             }}
             warning={<Warning text={'Incorrect Ethereum address format'} />}
           />
+          <PeginSignPreviewModal
+            isVisible={isSignModalPreview}
+            onBack={() => {
+              setIsSignModalPreview(false)
+            }}
+            onConfirm={() => {
+              setIsSignModalPreview(false)
+              setIsFirstSign(true)
+            }}
+          />
+          <PeginFirstSign
+            isVisible={isFirstSign}
+            amount={formatBalance(balance[0])}
+            destination={formatAddress(accounts[0])}
+            onBack={() => {
+              setIsFirstSign(false)
+              setIsSignModalPreview(true)
+            }}
+            onConfirm={() => {
+              signBTCPSBT("70736274ff01005e02000000010ae306c82a878f789780b096421b1ee1c11bf57a3b014925a80e6ff1a32ab78a0000000000ffffffff013800000000000000225120963b0923fd7a825e0333c4bf71c218a86f85504576ddb777f65d9c5a1e4587c000000000000100ea020000000001016e66e2d2e2b3c1dfc86294adf307615d48fc3715905bae26c718c198fe45d0380100000000ffffffff021029000000000000220020a1102d8c68b52d16532fa42737ebae6db487b7abbbe84cccc0328c19345ad91e7a740700000000001600147dd9efafecff9f8675c4a5a3cceef5b816241c3a0247304402201c042daaa0f8a92ef5124996d374b68439e232abf8efcf287a8b93b03bffc3f4022042d9b5163e74916a8d846299b029801f1837b445ec364290140955d8950ad8a4012102edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301b000000000105232102edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301bac0000",
+                [
+                  {
+                    index: 0,
+                    address: "tb1q0hv7ltlvl70cvawy5k3uemh4hqtzg8p663sv5d",
+                  },
+                ]
+              )
+            }} />
           <Supplementaries>
             <Supplementary>
               <span>Destination chain:</span>
@@ -86,17 +142,20 @@ export default function Bridge() {
             </Supplementary>
             <Supplementary>
               <span>You receive:</span>
-              <span>100 eBTC</span>
+              <span>{formatBalance(balance[0])} eBTC</span>
             </Supplementary>
             <Supplementary>
               <span>Refund address:</span>
-              <span>tb1qd28npep0s8frcm3y7dxqajkcy2m40eysplyr9v</span>
+              <span>{accounts[0]}</span>
             </Supplementary>
           </Supplementaries>
         </FormPanel>
         <Buttons>
-          <Button onClick={() => {}}>Back</Button>
-          <Button onClick={() => {}} active={formValid}>
+          <Button onClick={() => {
+            router.push('/')
+          }}>Back</Button>
+          <Button onClick={() => {
+          }} active={formValid}>
             Next
           </Button>
         </Buttons>

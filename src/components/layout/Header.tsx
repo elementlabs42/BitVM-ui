@@ -3,7 +3,7 @@ import { Navigation } from './header/Navigation'
 import { WalletButton } from './header/WalletButton'
 import { useBTCConnector } from '@/hooks/useBTCConnector'
 import { useState, useEffect } from 'react'
-import { copyToClipboard, formatAddress } from '@/utils/address'
+import { copyToClipboard, formatAddress, formatBalance } from '@/utils/address'
 import useMessage from 'antd/es/message/useMessage'
 import { useAccount } from 'wagmi'
 
@@ -14,16 +14,9 @@ export function Header() {
   const { isConnected: isBTCConnected, getAddress: getBTCAddress, getBalance: getBTCBalance } = useBTCConnector()
   const { address } = useAccount()
   const [messageApi, contextHolder] = useMessage()
-  useEffect(() => {
-    ;(async () => {
-      if (isBTCConnected()) {
-        const address = await getBTCAddress()
-        setBTCAddress(address ?? '')
 
-        const balance = await getBTCBalance()
-        setBTCBalance(balance ?? 0)
-      }
-    })()
+  useEffect(() => {
+
   }, [isBTCConnected, getBTCAddress, getBTCBalance])
 
   const copyAddress = (address: string) => {
@@ -47,14 +40,16 @@ export function Header() {
             copyAddress(btcAddress ?? '')
           }}
         >
-          {isBTCConnected() && isClient && <Wallet text={`${formatAddress(btcAddress)} | ${btcBalance} BTC`} />}
+          {isBTCConnected() && isClient && (
+            <Wallet text={`${formatAddress(btcAddress)} | ${formatBalance(btcBalance.toString(), 8)} BTC`} />
+          )}
         </div>
         <div
           onClick={() => {
             copyAddress(address ?? '')
           }}
         >
-          {address && isClient && <Wallet text={`${formatAddress(address)} | ${ebtc} eBTC`} />}
+          {address && isClient && <Wallet text={`${formatAddress(address)} | ${formatBalance(ebtc.toString(), 18)} eBTC`} />}
         </div>
       </WalletContainer>
     </Container>

@@ -3,6 +3,7 @@ import { useUnisatConnection } from './useUnisatConnection'
 import { useTrezorConnection } from './useTrezorConnection'
 import { useLedgerConnection } from './useLedgerConnection'
 import { useLocalStorage } from './useLocalStorage'
+import { createPsbt, finalizePsbtAndGetTxId } from './utils'
 
 export function useBTCConnector() {
   const unisatConnection = useUnisatConnection()
@@ -70,6 +71,26 @@ export function useBTCConnector() {
     }
   }
 
+  const signPsbt = async (psbtHex: string, signInputs: { index: number; address: string }[]) => {
+    if (selectedProvider === BTCConnectorType.UNISAT) {
+      const signedPsbt = await unisatConnection.signPsbt(psbtHex, signInputs)
+      return finalizePsbtAndGetTxId(signedPsbt)
+    }
+  }
+
+  const pushPsbt = async (psbtHex: string) => {
+    if (selectedProvider === BTCConnectorType.UNISAT) {
+      return unisatConnection.pushPsbt(psbtHex)
+    }
+  }
+
+  const getAccounts = async () => {
+    if (selectedProvider === BTCConnectorType.UNISAT) {
+      return unisatConnection.accounts
+    }
+  }
+
+
   return {
     selectedProvider,
     isConnected,
@@ -77,9 +98,12 @@ export function useBTCConnector() {
     selectTrezor,
     getBalance,
     getAddress,
+    getAccounts,
     selectLedger,
     isLedgerConnected: () => ledgerConnection.ledgerConnected,
     isTrezorConnected: () => trezorConnection.trezorConnected,
     isUnisatConnected: () => unisatConnection.connected,
+    signPsbt,
+    pushPsbt,
   }
 }

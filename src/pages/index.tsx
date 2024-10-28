@@ -15,7 +15,6 @@ export default function Home() {
   const { selectUnisat, isUnisatConnected, isLedgerConnected, isTrezorConnected, selectLedger, selectTrezor } =
     useBTCConnector()
   const { openConnectModal } = useConnectModal()
-
   return (
     <Page>
       {connectorType === 'BTC' ? (
@@ -39,11 +38,11 @@ export default function Home() {
               {isTrezorConnected() ? <FilledCircle /> : <Circle />}
               <WalletType>Trezor</WalletType>
             </BTCConnector>
-            <BTCConnector style={{ borderRight: 'none' }} onClick={selectUnisat}>
+            <BTCConnector onClick={selectUnisat}>
               {isUnisatConnected() ? <FilledCircle /> : <Circle />}
               <WalletType>Unisat</WalletType>
             </BTCConnector>
-            <BTCConnector>
+            <BTCConnector style={{ borderRight: 'none' }}>
               <Circle />
               <WalletType>Satoshi</WalletType>
             </BTCConnector>
