@@ -5,6 +5,7 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
 import { BtcConnectorProvider } from './BtcConnector'
+import { BridgeDirectionProvider } from './BridgeDirection'
 interface Props {
   children: ReactNode
 }
@@ -23,7 +24,9 @@ export function Providers(props: Props) {
     <SettingsProvider>
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <BtcConnectorProvider>{props.children}</BtcConnectorProvider>
+          <BtcConnectorProvider>
+            <BridgeDirectionProvider>{props.children}</BridgeDirectionProvider>
+          </BtcConnectorProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </SettingsProvider>

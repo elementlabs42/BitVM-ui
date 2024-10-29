@@ -8,9 +8,10 @@ import { darkTheme, lightTheme, RainbowKitProvider } from '@rainbow-me/rainbowki
 
 interface Props {
   children: ReactNode
+  className?: string
 }
 
-export function Page({ children }: Props) {
+export function Page({ children, className }: Props) {
   const { theme, useLightTheme } = useTheme()
   return (
     <ThemeProvider theme={theme}>
@@ -18,7 +19,7 @@ export function Page({ children }: Props) {
         <GlobalStyle />
         <Container>
           <Header />
-          <PageContent>{children}</PageContent>
+          <PageContent className={className}>{children}</PageContent>
           <Footer />
         </Container>
       </RainbowKitProvider>
@@ -38,7 +39,4 @@ const Container = styled.div`
 
 const PageContent = styled.div`
   flex-grow: 1;
-  overflow: visible;
-  align-items: center;
-  justify-content: left;
 `
