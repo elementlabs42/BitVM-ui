@@ -1,8 +1,11 @@
 import { API_URL } from '@/constants/urls'
-import { BitvmReponseStatus, Graph, PegInPsbt, Signatures } from '@/types'
+import { BitvmReponseStatus, Graph, GraphSimple, PegInPsbt, Signatures } from '@/types'
+import { bitvmGet, bitvmPost } from '@/utils'
 import { useEffect, useState } from 'react'
 
-export function useBitvmQuery() {
+//TODO: add real parameters for following hooks
+
+export function useBitvmHistory() {
   const [publicKey] = useState<string>('02edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301b')
   const [address] = useState<string>('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
   const [response, setResponse] = useState<Graph[]>()
@@ -10,15 +13,41 @@ export function useBitvmQuery() {
 
   useEffect(() => {
     ;(async () => {
-      const response = await fetch(`${API_URL}/history?pubkey=${publicKey}&address=${address}`)
-      const data = await response.json()
-      if (data.status === BitvmReponseStatus.OK) {
-        setResponse(data.data)
+      const { bitvmResponse, httpError } = await bitvmGet(`${API_URL}/history?pubkey=${publicKey}&address=${address}`)
+      if (httpError) {
+        // ignore http error
       } else {
-        setError(data.error)
+        if (bitvmResponse.status === BitvmReponseStatus.OK) {
+          setResponse(bitvmResponse.data)
+        } else {
+          setError(bitvmResponse.error)
+        }
       }
     })()
   }, [publicKey, address])
+
+  return { response, error }
+}
+
+export function useBitvmUnusedPegInGraphs(refresh: number) {
+  const [response, setResponse] = useState<GraphSimple[]>()
+  const [error, setError] = useState<string>()
+
+  useEffect(() => {
+    ;(async () => {
+      const { bitvmResponse, httpError } = await bitvmGet(`${API_URL}/pegins?t=${refresh}`)
+      if (httpError) {
+        console.error(httpError)
+      } else {
+        if (bitvmResponse.status === BitvmReponseStatus.OK) {
+          setResponse(bitvmResponse.data)
+        } else {
+          setError(bitvmResponse.error)
+        }
+      }
+    })()
+  }, [refresh])
+
   return {
     response,
     error,
@@ -35,14 +64,17 @@ export function useBitvmTransactions() {
 
   useEffect(() => {
     ;(async () => {
-      const response = await fetch(
+      const { bitvmResponse, httpError } = await bitvmGet(
         `${API_URL}/transactions?pubkey=${publicKey}&address=${address}&outpoint=${outpoint}&sat=${sat}`,
       )
-      const data = await response.json()
-      if (data.status === BitvmReponseStatus.OK) {
-        setResponse(data)
+      if (httpError) {
+        // ignore http error
       } else {
-        setError(data.error)
+        if (bitvmResponse.status === BitvmReponseStatus.OK) {
+          setResponse(bitvmResponse.data)
+        } else {
+          setError(bitvmResponse.error)
+        }
       }
     })()
   }, [publicKey, address, outpoint, sat])
@@ -62,21 +94,18 @@ export function useBitvmSignatures(signatures: Signatures) {
 
   useEffect(() => {
     ;(async () => {
-      const response = await fetch(
+      const { bitvmResponse, httpError } = await bitvmPost(
         `${API_URL}/signatures?pubkey=${publicKey}&address=${address}&outpoint=${outpoint}&sat=${sat}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(signatures),
-        },
+        signatures,
       )
-      const data = await response.json()
-      if (data.status === BitvmReponseStatus.OK) {
-        setSuccess(true)
+      if (httpError) {
+        // ignore http error
       } else {
-        setError(data.error)
+        if (bitvmResponse.status === BitvmReponseStatus.OK) {
+          setSuccess(true)
+        } else {
+          setError(bitvmResponse.error)
+        }
       }
     })()
   }, [publicKey, address, outpoint, sat, signatures])

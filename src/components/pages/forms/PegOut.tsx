@@ -1,200 +1,120 @@
 import styled from 'styled-components'
 import { ReactNode, useEffect, useState } from 'react'
-import { Label, SelectInput, TextInput, TextInputInfo, TextInputWithAction, Warning } from '@/components/controls'
-import { Bitcoin, Swap } from '@/components/icons'
-import { BTCConnectorType } from '@/constants/connector'
-import { useBtcConnector } from '@/providers/BtcConnector'
-import { empty, formatBtc, formatInput, isPow2, parseAddressType, parseBtc, prevPow2 } from '@/utils'
-import { isAddress } from 'viem'
+import { Label, SelectInput, TextInput, TextInputInfo, Warning } from '@/components/controls'
+import { Swap } from '@/components/icons'
+import { BTCAddressType, empty, formatBtc, parseAddressType } from '@/utils'
 import { FormPanel, Subtitle, Supplementaries, Supplementary, SwapIcon } from './styles'
+import { useBitvmUnusedPegInGraphs } from '@/hooks/useBitvm'
+import { useAccount } from 'wagmi'
+import { useBalanceOf } from '@/hooks/ethereum'
+import { EBTC_ADDRESSES } from '@/constants/addresses'
 
 interface Props {
   setFormValid: (valid: boolean) => void
 }
 
 export function PegOut({ setFormValid }: Props) {
+  const [refresh] = useState(0)
+  const { response } = useBitvmUnusedPegInGraphs(refresh)
+  const account = useAccount()
+  const eBtcAddress = EBTC_ADDRESSES[account.chainId ?? 0]
+  const [eBtcBalance] = useBalanceOf(eBtcAddress)
+
   const [amountValid, setAmountValid] = useState(false)
   const [addressValid, setAddressValid] = useState(false)
   const [selectValid, setSelectValid] = useState(false)
-  const { selectedProvider, isConnected, btcAddress, btcBalance } = useBtcConnector()
-  const [addressType, setAddressType] = useState('')
 
-  const [amountField, setAmountField] = useState('')
+  const [amountField, setAmountField] = useState('0.0')
   const [amountWarning, setAmountWarning] = useState<ReactNode>()
   const [addressField, setAddressField] = useState('')
   const [addressWarning, setAddressWarning] = useState<ReactNode>()
+  const [selectedKey, setSelectedKey] = useState<string>()
+  const [received, setReceived] = useState<bigint>(0n)
 
   useEffect(() => {
-    let valid = amountValid && addressValid && isConnected
-    switch (selectedProvider) {
-      case BTCConnectorType.UNISAT:
-        break
-      case BTCConnectorType.LEDGER:
-      case BTCConnectorType.TREZOR:
-        valid = valid && selectValid
-        break
-      default:
-        valid = false
-        break
-    }
+    const valid = amountValid && addressValid && !!account.address && selectValid
     setFormValid(valid)
-  }, [amountValid, addressValid, selectValid, isConnected, selectedProvider, setFormValid])
+  }, [amountValid, addressValid, selectValid, account.address, setFormValid])
 
-  useEffect(() => {
-    setAddressType(parseAddressType(btcAddress).address)
-  }, [btcAddress])
-
-  const accountInfo = () => {
-    if (isConnected) {
-      switch (selectedProvider) {
-        case BTCConnectorType.UNISAT:
-          return (
-            <TextInputInfo
-              label={<Label text={'Bitcoin account'} />}
-              value={
-                <Account>
-                  <AccountType>{addressType}</AccountType>
-                  <AccountAmount>{`${btcBalance} sat`}</AccountAmount>
-                  <AccountAddress>{btcAddress}</AccountAddress>
-                </Account>
-              }
-            />
-          )
-        case BTCConnectorType.LEDGER:
-        case BTCConnectorType.TREZOR:
-          return (
-            <SelectInput
-              label={<Label text={'Select Bitcoin account to bridge'} withHelp={true} />}
-              notifyValidation={setSelectValid}
-              placeHolder="Select Bitcoin account"
-            >
-              <Account>
-                <AccountType>Legacy</AccountType>
-                <AccountAmount>1.19 BTC</AccountAmount>
-              </Account>
-              <Account>
-                <AccountType>SegWit</AccountType>
-                <AccountAmount>5.32 BTC</AccountAmount>
-              </Account>
-              <Account>
-                <AccountType>Native SegWit</AccountType>
-                <AccountAmount>5.32 BTC</AccountAmount>
-              </Account>
-            </SelectInput>
-          )
-      }
-    }
-    return <Warning text={'Please connect a BTC wallet'} />
-  }
-
-  const inputLabel = <Label text={'You Supply'} withHelp={true} />
   const warningLabel = (text: string) => <Warning text={text} withHelp={true} />
-  const validateBtcInput = (t: string): boolean => {
-    const parsedBtc = parseBtc(t)
-    const valid = ((parsedBtc) => {
-      if (parsedBtc) {
-        if (parsedBtc > btcBalance) {
-          setAmountWarning(warningLabel('The satoshi equivalent of the number is larger than account balance'))
-          return false
-        } else if (!isPow2(parsedBtc)) {
-          setAmountWarning(warningLabel('The satoshi equivalent of the number is a power of 2'))
-          return false
-        }
+  useEffect(() => {
+    if (response && selectedKey) {
+      const index = parseInt(selectedKey)
+      const graph = response[index]
+      setAmountField(formatBtc(graph.amount))
+      setReceived((BigInt(graph.amount) * 99n) / 100n)
+      if (graph.amount > eBtcBalance) {
+        setAmountWarning(warningLabel('The amount is larger than account balance'))
+        setAmountValid(false)
+      } else {
+        setAmountWarning(undefined)
+        setAmountValid(true)
       }
-      setAmountWarning(undefined)
-      return true
-    })(parsedBtc)
-    setAmountValid(valid)
-
-    const correction = empty(t) ? '' : formatInput(t)
-    if (correction !== undefined) {
-      setAmountField(correction)
     }
-    return valid
-  }
+  }, [selectedKey, response, eBtcBalance, setAmountField, setAmountWarning])
 
   return (
     <FormPanel>
       <SwapIcon icon={<Swap />} size={1} />
       <Subtitle>Redeem</Subtitle>
       <Supplementary>Supply eBTC to send BTC to your Bitcoin wallet</Supplementary>
-      {accountInfo()}
-      <TextInputWithAction
-        label={inputLabel}
-        warning={amountWarning}
-        value={amountField}
-        placeHolder="0.0"
-        validate={validateBtcInput}
-        inputIcon={<Bitcoin />}
-        actions={[
-          {
-            name: 'POW2',
-            onAction: (input) => {
-              if (input.current) {
-                const parsedBtc = parseBtc(input.current.value)
-                if (parsedBtc) {
-                  const near = formatBtc(prevPow2(parsedBtc))
-                  input.current.value = near
-                  validateBtcInput(near)
-                }
-              }
-            },
-          },
-          {
-            name: 'MAX',
-            onAction: (input) => {
-              if (input.current) {
-                const pow2 = formatBtc(prevPow2(btcBalance))
-                input.current.value = pow2
-                validateBtcInput(pow2)
-              }
-            },
-          },
-        ]}
-      />
+      <SelectInput
+        label={<Label text={'Select Peg-in graph'} withHelp={true} />}
+        validate={setSelectValid}
+        select={setSelectedKey}
+        placeHolder={response ? 'Select Peg-in Graph' : 'Loading ...'}
+      >
+        {response &&
+          response.map((graph, i) => (
+            <Graph key={i}>
+              <GraphAmount>{formatBtc(graph.amount)} BTC</GraphAmount>
+              <GraphId>{graph.graphId}</GraphId>
+            </Graph>
+          ))}
+      </SelectInput>
+      {account.address ? (
+        <TextInputInfo
+          label={<Label text={'You Supply'} withHelp={true} />}
+          value={<>{amountField}</>}
+          warning={amountWarning}
+        />
+      ) : (
+        <Warning text={'Please connect a Ethereum wallet'} />
+      )}
       <TextInput
         label={<Label text={'Recipient address'} />}
         warning={addressWarning}
         value={addressField}
         validate={(t) => {
-          const valid = isAddress(t)
+          const valid = parseAddressType(t).address !== BTCAddressType.UNKNOWN
           setAddressField(t)
           setAddressValid(valid)
-          setAddressWarning(!valid ? warningLabel('Incorrect Ethereum address format') : undefined)
+          setAddressWarning(!valid ? warningLabel('Incorrect Bitcoin address format') : undefined)
           return valid
         }}
       />
       <Supplementaries>
         <Supplementary>
-          <span>Destination chain:</span>
-          <span>Ethereum</span>
-        </Supplementary>
-        <Supplementary>
           <span>Handling fee:</span>
-          <span>0</span>
+          <span>1%</span>
         </Supplementary>
         <Supplementary>
           <span>You receive:</span>
-          <span>{empty(amountField) ? '0' : amountField} eBTC</span>
-        </Supplementary>
-        <Supplementary>
-          <span>Refund address:</span>
-          <span>{isConnected && btcAddress ? btcAddress : 'N/A'}</span>
+          <span>{empty(amountField) ? '0' : formatBtc(received)} eBTC</span>
         </Supplementary>
       </Supplementaries>
     </FormPanel>
   )
 }
 
-const Account = styled.div`
+const Graph = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   column-gap: 1em;
 `
 
-const AccountAddress = styled.div``
-const AccountType = styled.div``
-const AccountAmount = styled.div`
+const GraphAmount = styled.div``
+const GraphId = styled.div`
   color: ${({ theme }) => theme.FooterText};
 `

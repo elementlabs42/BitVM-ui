@@ -4,7 +4,18 @@ import { spawnSync } from 'child_process'
 import { empty, getErrorOnly } from '@/utils'
 import * as bitcoin from 'bitcoinjs-lib'
 import { isAddress } from 'viem'
-import { BitvmResponseData, Command, Env, Graph, GraphType, PegInPsbt, Tx, TxStatus, TxType } from '@/types'
+import {
+  BitvmResponseData,
+  Command,
+  Env,
+  Graph,
+  GraphSimple,
+  GraphType,
+  PegInPsbt,
+  Tx,
+  TxStatus,
+  TxType,
+} from '@/types'
 import { BitvmReponseStatus, SignaturesArgs, TransactionsArgs } from '@/types'
 
 const DEFAULT_PATH = 'bitvm/'
@@ -73,6 +84,10 @@ export class BitvmService {
     return this.call(Command.SIGNATURES, [...Object.values(args).map((x) => x.toString())])
   }
 
+  getUnusedPegInGraphs() {
+    return this.call(Command.PEGINS, [])
+  }
+
   static validateCommand(input: string) {
     return Object.values(Command).find((cmd) => cmd.toString() === input.toLowerCase())
   }
@@ -110,6 +125,12 @@ export class BitvmService {
             return this.interperetTransactions(obj.data)
           case Command.SIGNATURES:
             return ''
+          case Command.PEGINS:
+            if (Array.isArray(obj.data)) {
+              return this.interperetUnusedPegInGraphs(obj.data)
+            } else {
+              throw new Error('Invalid response, data is not vector')
+            }
           default:
             if (Array.isArray(obj.data)) {
               return this.interperetGraphs(obj.data)
@@ -122,6 +143,17 @@ export class BitvmService {
       }
     }
     throw new Error(`Response doesn't contain delimeter`)
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  private interperetUnusedPegInGraphs(graphs: any[]): GraphSimple[] {
+    return graphs.map((g) => {
+      const graph: GraphSimple = {
+        graphId: String(g.graph_id),
+        amount: BigInt(g.amount),
+      }
+      return graph
+    })
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */

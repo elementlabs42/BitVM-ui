@@ -65,7 +65,7 @@ export function PegIn({ setFormValid }: Props) {
           return (
             <SelectInput
               label={<Label text={'Select Bitcoin account to bridge'} withHelp={true} />}
-              notifyValidation={setSelectValid}
+              validate={setSelectValid}
               placeHolder="Select Bitcoin account"
             >
               <Account>
