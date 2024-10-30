@@ -5,7 +5,7 @@ import { getErrorOnly } from '@/utils'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { validateBitcoinPublicKey, validateEthereumAddress } from '@/services/bitvm/validation'
 
-type WithdrawerArgs = {
+type HistoryArgs = {
   pubkey: string
   address: string
 }
@@ -21,8 +21,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<BitvmR
   }
 }
 
-function validateHistory(req: NextApiRequest): ValidationResult<WithdrawerArgs> {
-  const result: ValidationResult<WithdrawerArgs> = { status: 200 }
+function validateHistory(req: NextApiRequest): ValidationResult<HistoryArgs> {
+  const result: ValidationResult<HistoryArgs> = { status: 200 }
 
   const pubkey = validateBitcoinPublicKey(req)
   if (!pubkey) {

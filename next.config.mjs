@@ -16,4 +16,9 @@ const nextConfig = {
   }
 };
 
+// monkey patch for bigint JSON.stringify
+BigInt.prototype.toJSON = function () {
+  return this.toString()
+}
+
 export default nextConfig;

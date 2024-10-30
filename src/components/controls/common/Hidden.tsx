@@ -5,6 +5,8 @@ interface Props {
   children?: React.ReactNode
 }
 
+export const HIDDEN_Z_INDEX = 50
+
 export function Hidden({ onClick, children }: Props) {
   return <Container onClick={onClick}>{children}</Container>
 }
@@ -17,5 +19,5 @@ const Container = styled.div`
   bottom: 0;
   opacity: 0;
   background-color: transparent;
-  z-index: 10;
+  z-index: ${HIDDEN_Z_INDEX};
 `

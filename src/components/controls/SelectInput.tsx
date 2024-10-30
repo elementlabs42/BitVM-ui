@@ -1,23 +1,23 @@
 import styled from 'styled-components'
-import { Children, ReactNode, useEffect, useRef, useState } from 'react'
-import { InputContainer, InputStyle, withLabel } from './common'
+import { Children, ReactElement, ReactNode, useEffect, useRef, useState } from 'react'
+import { InputContainer, InputStyle, withLabel, Hidden, HIDDEN_Z_INDEX } from './common'
 import { RoundedIcon, Warning } from '.'
 import { ChevronDown } from '../icons'
 import { Borders } from '@/constants/themes'
-import { Hidden } from './Hidden'
 import { Checked } from '../icons/history'
 
 interface Props {
   label: ReactNode
-  notifyValidation?: (valid: boolean) => void
+  validate?: (valid: boolean) => void
+  select?: (key: string) => void
   placeHolder?: ReactNode
-  children: ReactNode
+  children?: ReactNode
   className?: string
 }
 
 const FADE_OUT_DURATION = 120
 
-export function SelectInput({ label, notifyValidation, placeHolder = '', children, className }: Props) {
+export function SelectInput({ label, validate, select, placeHolder = '', children, className }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const iconRef = useRef<SVGSVGElement>(null)
   const items = Children.toArray(children)
@@ -26,7 +26,7 @@ export function SelectInput({ label, notifyValidation, placeHolder = '', childre
   const [onceOpened, setOnceOpened] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string | null>()
   const [selected, setSelected] = useState<Element | null>(null)
-  const [valid, setValid] = useState(true)
+  const [warning, setWarning] = useState<ReactElement>()
 
   const toggleSelect = () => {
     if (!open) {
@@ -73,26 +73,29 @@ export function SelectInput({ label, notifyValidation, placeHolder = '', childre
     const itemRef = itemsRef.current.find((el) => el?.getAttribute('data-key') === selectedKey)
     if (itemRef) {
       setSelected(itemRef.children.item(0))
+      if (select) {
+        select(selectedKey ?? '')
+      }
     }
-  }, [selectedKey])
+  }, [selectedKey, select])
 
   useEffect(() => {
-    setValid(!onceOpened || !!selected)
-    if (notifyValidation) {
-      notifyValidation(!!selected)
+    setWarning(onceOpened && !selected ? <Warning text="Please select an option" /> : undefined)
+    if (validate) {
+      validate(!!selected)
     }
-  }, [onceOpened, selected, notifyValidation])
+  }, [onceOpened, selected, validate])
 
-  const select = selected ? (
-    <Select dangerouslySetInnerHTML={{ __html: selected.outerHTML }} />
+  const selection = selected ? (
+    <Selection dangerouslySetInnerHTML={{ __html: selected.outerHTML }} />
   ) : (
-    <Select>{placeHolder != '' && <PlaceHolder>{placeHolder}</PlaceHolder>}</Select>
+    <Selection>{placeHolder != '' && <PlaceHolder>{placeHolder}</PlaceHolder>}</Selection>
   )
 
   const input = (
     <Container>
       <SelectContainer className={className} onClick={toggleSelect}>
-        {select}
+        {selection}
         <Icon icon={<IconSvg iconRef={iconRef} />} noBorder={true} size={1} />
       </SelectContainer>
       <Items ref={wrapperRef}>
@@ -117,8 +120,7 @@ export function SelectInput({ label, notifyValidation, placeHolder = '', childre
   )
   return withLabel({
     label,
-    valid,
-    warning: <Warning text="Please select an option" />,
+    warning,
     input,
     className,
   })
@@ -132,7 +134,7 @@ const SelectContainer = styled(InputContainer)`
   cursor: pointer;
 `
 
-const Select = styled.div`
+const Selection = styled.div`
   ${InputStyle}
 `
 
@@ -157,7 +159,7 @@ const Items = styled.div`
     transform ${FADE_OUT_DURATION}ms ease-out;
   background-color: ${({ theme }) => theme.Background};
   width: 100%;
-  z-index: 20;
+  z-index: ${HIDDEN_Z_INDEX + 1};
 `
 
 const ItemContent = styled.div`
@@ -171,7 +173,7 @@ const ItemContent = styled.div`
     0px 20px 24px -4px ${({ theme }) => theme.ShadowInner},
     0px 8px 8px -4px ${({ theme }) => theme.ShadowOuter};
   > * {
-    z-index: 20;
+    z-index: ${HIDDEN_Z_INDEX + 1};
     overflow: hidden;
     padding: 0.5em 1em;
     cursor: pointer;

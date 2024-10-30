@@ -1,9 +1,11 @@
 import React, { ReactNode } from 'react'
 import { SettingsProvider } from './settings/provider'
-import { mainnet } from 'wagmi/chains'
+import { mainnet, sepolia } from 'wagmi/chains'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
+import { BtcConnectorProvider } from './BtcConnector'
+import { BridgeDirectionProvider } from './BridgeDirection'
 interface Props {
   children: ReactNode
 }
@@ -11,7 +13,8 @@ interface Props {
 const config = getDefaultConfig({
   appName: 'BitVm',
   projectId: 'e355babd1f0eb181905a298f13d990fd',
-  chains: [mainnet],
+  //TODO remove sepolia in production
+  chains: [mainnet, sepolia],
   ssr: true,
 })
 const queryClient = new QueryClient()
@@ -21,7 +24,9 @@ export function Providers(props: Props) {
     <SettingsProvider>
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider>{props.children}</RainbowKitProvider>
+          <BtcConnectorProvider>
+            <BridgeDirectionProvider>{props.children}</BridgeDirectionProvider>
+          </BtcConnectorProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </SettingsProvider>

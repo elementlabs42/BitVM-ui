@@ -1,15 +1,11 @@
 import { DarkTheme, LightTheme } from '@/constants/themes'
 import { useSettings } from '@/providers/settings/context'
-import { useEffect, useState } from 'react'
+import { useIsClient } from './useIsClient'
 
 export function useTheme() {
-  const [isClient, setIsClient] = useState(false)
+  const isClient = useIsClient()
   const { settings, setSettings } = useSettings()
   const theme = settings.useLightTheme ? LightTheme : DarkTheme
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
 
   function toggleTheme() {
     if (settings.useLightTheme) {
