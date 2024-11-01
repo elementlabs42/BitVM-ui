@@ -1,5 +1,5 @@
 export const Colors = {
-  Black: '#111',
+  Black: '#000',
   BlackTransparent: 'rgba(0, 0, 0, 0.6)',
   BlackTransparentLess: 'rgba(0, 0, 0, 0.3)',
   White: '#FFFFFF',
