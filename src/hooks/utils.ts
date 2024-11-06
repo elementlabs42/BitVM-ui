@@ -1,5 +1,5 @@
 import * as bitcoin from 'bitcoinjs-lib'
-
+import { decodePsbt } from 'bitcoinjs-lib/psbt'
 export const createPsbt = (rawTxHex: string, witnessUtxoHex: string, witnessScriptHex: string) => {
   const txDetails = bitcoin.Transaction.fromHex(rawTxHex)
 
@@ -51,10 +51,31 @@ export const createPsbt = (rawTxHex: string, witnessUtxoHex: string, witnessScri
   return psbt.toHex()
 }
 
+export const hexToBase64 = (hexStr: string) => {
+  //@ts-ignore
+  const byteArray = new Uint8Array(hexStr.match(/[\da-f]{2}/gi).map((h) => parseInt(h, 16)))
+  // Convert byte array to Base64
+  const base64Val = Buffer.from(byteArray).toString('base64')
+  return base64Val
+}
+
 export const finalizePsbtAndGetTxId = (psbtHex: string) => {
-  const psbt = bitcoin.Psbt.fromHex(psbtHex)
-  psbt.finalizeAllInputs()
-  const transaction = psbt.extractTransaction()
-  const txId = transaction.getId()
-  return txId
+  try {
+    const psbt = bitcoin.Psbt.fromBase64(hexToBase64(psbtHex))
+
+    // Exploring individual components of the PSBT
+    console.log("Inputs:");
+    psbt.data.inputs.forEach((input, index) => {
+      console.log(`Input ${index}:`, input);
+    });
+
+    console.log("Outputs:");
+    psbt.data.outputs.forEach((output, index) => {
+      console.log(`Output ${index}:`, output);
+    })
+    const tx = psbt.extractTransaction()
+    return tx.getId()
+  } catch (error) {
+    console.error("Failed to decode PSBT:", error);
+  }
 }
