@@ -8,12 +8,12 @@ import {
 import { Refresh } from '@/components/icons'
 import { Active, CircledChecked, PegIn, PegOut } from '@/components/icons/history'
 import { Page } from '@/components/layout'
-import { useBitvmQuery } from '@/hooks/useBitvm'
+import { useBitvmHistory } from '@/hooks/useBitvm'
 import { GraphType, TxType } from '@/types'
 import styled from 'styled-components'
 
 export default function History() {
-  const { response } = useBitvmQuery()
+  const { response } = useBitvmHistory()
   return (
     <Page>
       <main>

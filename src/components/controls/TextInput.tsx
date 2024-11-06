@@ -29,13 +29,13 @@ interface ActionProps extends Omit<Props, 'action'> {
   actions: Action[]
 }
 
-export function TextInputInfo({ label, value, className }: InfoProps) {
+export function TextInputInfo({ label, warning, value, className }: InfoProps) {
   const input = (
     <InputContainer className={className}>
       <InputBox>{value}</InputBox>
     </InputContainer>
   )
-  return withLabel({ label, input, className })
+  return withLabel({ label, warning, input, className })
 }
 
 export function TextInputWithAction({

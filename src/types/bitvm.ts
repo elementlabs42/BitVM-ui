@@ -9,6 +9,7 @@ export enum Command {
   HISTORY = 'history',
   TRANSACTIONS = 'transactions',
   SIGNATURES = 'signatures',
+  PEGINS = 'pegins',
 }
 
 export type TransactionsArgs = {
@@ -30,7 +31,7 @@ export enum BitvmReponseStatus {
   NOK = 'NOK',
 }
 
-export type BitvmResponseData = Graph[] | PegInPsbt | string
+export type BitvmResponseData = GraphSimple[] | Graph[] | PegInPsbt | string
 export type BitvmResponse = {
   status: BitvmReponseStatus
   data?: BitvmResponseData
@@ -71,10 +72,13 @@ export enum GraphType {
   UNKNOWN = 'unknown',
 }
 
-export type Graph = {
+export type Graph = GraphSimple & {
   type: GraphType
-  graphId: string
-  amount: bigint
   status: string
   transactions: Tx[]
+}
+
+export type GraphSimple = {
+  graphId: string
+  amount: bigint
 }
