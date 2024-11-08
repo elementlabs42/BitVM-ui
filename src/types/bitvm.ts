@@ -31,7 +31,7 @@ export enum BitvmReponseStatus {
   NOK = 'NOK',
 }
 
-export type BitvmResponseData = GraphSimple[] | Graph[] | PegInPsbt | string
+export type BitvmResponseData = PegInGraph[] | Graph[] | PegInPsbt | string
 export type BitvmResponse = {
   status: BitvmReponseStatus
   data?: BitvmResponseData
@@ -66,19 +66,28 @@ export type PegInPsbt = {
   refund: string
 }
 
+type BaseGraph = {
+  graphId: string
+  amount: bigint
+}
+
 export enum GraphType {
   PEG_IN = 'peg_in',
   PEG_OUT = 'peg_out',
   UNKNOWN = 'unknown',
 }
 
-export type Graph = GraphSimple & {
+export type Graph = BaseGraph & {
   type: GraphType
   status: string
   transactions: Tx[]
 }
 
-export type GraphSimple = {
-  graphId: string
-  amount: bigint
+export type PegInGraph = BaseGraph & {
+  sourceOutpoint: OutPoint
+}
+
+export type OutPoint = {
+  txid: string
+  vout: number
 }

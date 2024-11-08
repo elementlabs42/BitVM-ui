@@ -8,8 +8,7 @@ import { WalletModalBtc } from '../controls'
 import { formatAddress } from '@/utils'
 import { useBtcConnector } from '@/providers/BtcConnector'
 import { useClipboard } from '@/hooks/useClipboard'
-import { useBalanceOf, useEthAccount } from '@/hooks/ethereum'
-import { EBTC_ADDRESSES } from '@/constants/addresses'
+import { useEBtcBalanceOf, useEthAccount } from '@/hooks/ethereum'
 
 export function Header() {
   const [isBTCWalletModalOpen, setIsBTCWalletModalOpen] = useState(false)
@@ -18,8 +17,7 @@ export function Header() {
   const { openConnectModal } = useEthereumConnectModal()
   const [ethereumAccount, isUnsupported] = useEthAccount()
   const queryClient = useQueryClient()
-  const eBtcAddress = EBTC_ADDRESSES[ethereumAccount.chainId ?? 0]
-  const [eBtcBalance, balanceOfQueryKey] = useBalanceOf(eBtcAddress)
+  const [eBtcBalance, balanceOfQueryKey] = useEBtcBalanceOf(ethereumAccount)
 
   const [copyAddress, contextHolder] = useClipboard('Address copied to clipboard')
 

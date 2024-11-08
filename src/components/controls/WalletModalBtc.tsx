@@ -1,4 +1,4 @@
-import { Modal, Riseup, Wallet } from './common'
+import { Riseup, Wallet, WalletModal } from './common'
 import { Ledger, Satoshi, Trezor, Unisat } from '../icons/wallets'
 import styled from 'styled-components'
 import { useBtcConnector } from '@/providers/BtcConnector'
@@ -25,6 +25,6 @@ const Spacer = styled.div`
   margin: 1em;
 `
 
-const StyledModal = styled(Modal)`
+const StyledModal = styled(WalletModal)`
   ${Riseup}
 `

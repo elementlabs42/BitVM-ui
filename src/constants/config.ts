@@ -20,7 +20,7 @@ export function getWagmiChainsConfig(): readonly [Chain, ...Chain[]] {
   return [chains[0], ...chains.slice(1)]
 }
 
-function defineLocalChain(): Chain | undefined {
+export function defineLocalChain(): Chain | undefined {
   if (process.env.NEXT_PUBLIC_LOCAL_RPC && process.env.NEXT_PUBLIC_LOCAL_CHAINID) {
     return defineChain({
       id: parseInt(process.env.NEXT_PUBLIC_LOCAL_CHAINID),

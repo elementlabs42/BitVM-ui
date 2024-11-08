@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { useState } from 'react'
 import { RoundedElement } from '@/components/controls'
-import { BackgroundPattern } from '@/components/controls'
+import { BackgroundPattern } from '@/components/controls/common'
 import { PegIn, PegOut } from '@/components/pages/forms'
 import { HomeRoutes } from './useHomeRoutes'
 import { BridgeDirection, useBridgeDirection } from '@/providers/BridgeDirection'
@@ -13,6 +13,7 @@ interface Props {
 export function Bridge({ route }: Props) {
   const [formValid, setFormValid] = useState(false)
   const { direction } = useBridgeDirection()
+  const [submit, setSubmit] = useState<(valid?: boolean) => void>()
 
   return (
     <>
@@ -22,11 +23,11 @@ export function Bridge({ route }: Props) {
         {direction === BridgeDirection.PEG_IN ? (
           <PegIn setFormValid={setFormValid} />
         ) : (
-          <PegOut setFormValid={setFormValid} />
+          <PegOut onFormValidate={setFormValid} setSubmit={setSubmit} />
         )}
         <Buttons>
           {route && <Button onClick={() => route?.('Home')}>Back</Button>}
-          <Button onClick={() => {}} active={formValid}>
+          <Button onClick={submit} active={formValid}>
             Next
           </Button>
         </Buttons>
@@ -37,9 +38,9 @@ export function Bridge({ route }: Props) {
 
 const BackgroundPatternStyled = styled(BackgroundPattern)`
   width: 208px;
+  height: 208px;
   position: absolute;
   margin: 0;
-  height: 208px;
   z-index: 0;
   pointer-events: none;
 `
