@@ -1,24 +1,29 @@
-import { Borders, FontWeights } from '@/constants/themes'
-import React from 'react'
+import { Borders, Colors, FontWeights } from '@/constants/themes'
+import { ReactNode } from 'react'
 import styled from 'styled-components'
 import { Roboto_Mono } from 'next/font/google'
 import { Dot } from '../../icons'
+import { Tooltip } from '@/components/controls'
 
 interface Props {
   text: string
+  unsupported?: boolean
+  tooltip?: ReactNode
   onClick?: () => void
   className?: string
 }
 
 const mono = Roboto_Mono({ subsets: ['latin'] })
 
-export function WalletButton({ text, onClick, className }: Props) {
+export function WalletButton({ text, unsupported, tooltip, onClick, className }: Props) {
   return (
-    <Container className={className} onClick={onClick}>
-      <Button className={mono.className}>
-        <DotIcon />
-        {text}
-      </Button>
+    <Container className={className}>
+      <Tooltip content={tooltip}>
+        <Button className={mono.className} $gray={unsupported} onClick={onClick}>
+          <DotIcon />
+          {text}
+        </Button>
+      </Tooltip>
     </Container>
   )
 }
@@ -27,7 +32,9 @@ const Container = styled.div`
   display: flex;
 `
 
-const Button = styled.span`
+const Button = styled.span.attrs<{ $gray?: boolean }>((props) => ({
+  $gray: props.$gray,
+}))`
   height: 30px;
   padding: 10px 10px 10px 5px;
   display: flex;
@@ -37,7 +44,7 @@ const Button = styled.span`
   text-decoration: none;
   font-size: 12px;
   font-weight: ${FontWeights.Semibold};
-  background-color: ${({ theme }) => theme.ButtonBackground};
+  background-color: ${({ theme, $gray }) => ($gray ? Colors.Gray : theme.ButtonBackground)};
   border-radius: ${Borders.ButtonRadius};
   cursor: pointer;
 `

@@ -8,28 +8,50 @@ import {
 import { Refresh } from '@/components/icons'
 import { Active, CircledChecked, PegIn, PegOut } from '@/components/icons/history'
 import { Page } from '@/components/layout'
+import { useBridgePegOuts } from '@/hooks/ethereum/useBridge'
 import { useBitvmHistory } from '@/hooks/useBitvm'
-import { GraphType, TxType } from '@/types'
+import { Graph, GraphType, TxType } from '@/types'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { useAccount } from 'wagmi'
 
 export default function History() {
+  const account = useAccount()
   const { response } = useBitvmHistory()
+  const pegOutInitiatedEvents = useBridgePegOuts(account)
+  const [graphs, setGraphs] = useState<Graph[]>()
+
+  useEffect(() => {
+    //TODO: match logs with peg out graph in response
+    if (response && pegOutInitiatedEvents) {
+      const newPegOutGraphs = pegOutInitiatedEvents.map((log) => ({
+        graphId: '',
+        amount: log.amount,
+        type: GraphType.PEG_OUT,
+        status: 'Peg Out Logged, waiting for operator ...',
+        transactions: [],
+        receipient: log.destinationAddress,
+      }))
+      setGraphs([...newPegOutGraphs, ...response])
+    }
+  }, [response, pegOutInitiatedEvents])
   return (
     <Page>
       <main>
         <Title>History</Title>
         <PaginationPanel>
           <AccordionGroup>
-            {response &&
-              response.map((graph, i) => (
+            {graphs &&
+              graphs.map((graph, i) => (
                 <Accordion key={i}>
-                  <Graph icon={graph.type === GraphType.PEG_IN ? <PegIn /> : <PegOut />}>
+                  <GraphItem icon={graph.type === GraphType.PEG_IN ? <PegIn /> : <PegOut />}>
                     <span>
-                      {graph.type === GraphType.PEG_IN ? `Bridge ${graph.amount} BTC` : `Redeem ${graph.amount} eBTC`}{' '}
-                      to {' [recipient]'}
+                      {graph.type === GraphType.PEG_IN
+                        ? `Bridge ${graph.amount} BTC to [recipient]`
+                        : `Redeem ${graph.amount} eBTC to ${graph.receipient}`}
                     </span>
                     <span>{graph.status}</span>
-                  </Graph>
+                  </GraphItem>
                   {graph.transactions.map((tx, j) => {
                     const icon = tx.status.confirmed ? <CircledChecked /> : <Active />
                     const txName =
@@ -66,6 +88,6 @@ const Title = styled.h1`
   padding: 0 1vw;
 `
 
-const Graph = styled(ContentWithIcon)``
+const GraphItem = styled(ContentWithIcon)``
 
 const Transaction = styled(ContentWithIconAndAction)``

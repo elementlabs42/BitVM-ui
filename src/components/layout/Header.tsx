@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { useAccount as useEthereumAccount } from 'wagmi'
 import { useConnectModal as useEthereumConnectModal } from '@rainbow-me/rainbowkit'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -9,18 +8,16 @@ import { WalletModalBtc } from '../controls'
 import { formatAddress } from '@/utils'
 import { useBtcConnector } from '@/providers/BtcConnector'
 import { useClipboard } from '@/hooks/useClipboard'
-import { useBalanceOf } from '@/hooks/ethereum'
-import { EBTC_ADDRESSES } from '@/constants/addresses'
+import { useEBtcBalanceOf, useEthAccount } from '@/hooks/ethereum'
 
 export function Header() {
   const [isBTCWalletModalOpen, setIsBTCWalletModalOpen] = useState(false)
   const { isConnected: isBTCConnected, btcAddress, btcBalance } = useBtcConnector()
 
   const { openConnectModal } = useEthereumConnectModal()
-  const ethereumAccount = useEthereumAccount()
+  const [ethereumAccount, isUnsupported] = useEthAccount()
   const queryClient = useQueryClient()
-  const eBtcAddress = EBTC_ADDRESSES[ethereumAccount.chainId ?? 0]
-  const [eBtcBalance, balanceOfQueryKey] = useBalanceOf(eBtcAddress)
+  const [eBtcBalance, balanceOfQueryKey] = useEBtcBalanceOf(ethereumAccount)
 
   const [copyAddress, contextHolder] = useClipboard('Address copied to clipboard')
 
@@ -39,9 +36,16 @@ export function Header() {
     }
   }
 
-  const ethereumWalletText = ethereumAccount.address
-    ? `${formatAddress(ethereumAccount.address)} | ${eBtcBalance} eBTC`
-    : 'Connect Ethereum Wallet'
+  const ethereumWalletText = (() => {
+    if (ethereumAccount.address) {
+      if (isUnsupported) {
+        return 'Unsupported Network'
+      }
+      return `${formatAddress(ethereumAccount.address)} | ${eBtcBalance} eBTC`
+    } else {
+      return 'Connect Ethereum Wallet'
+    }
+  })()
   const ethereumWalletOnClick = async () => {
     if (ethereumAccount.address) {
       copyAddress(ethereumAccount.address)
@@ -66,7 +70,12 @@ export function Header() {
       {contextHolder}
       <WalletContainer>
         <Wallet text={btcWalletText} onClick={btcWalletOnClick} />
-        <Wallet text={ethereumWalletText} onClick={ethereumWalletOnClick} />
+        <Wallet
+          unsupported={ethereumAccount.isConnected && isUnsupported}
+          text={ethereumWalletText}
+          tooltip={ethereumAccount.chain?.name}
+          onClick={ethereumWalletOnClick}
+        />
       </WalletContainer>
     </Container>
   )

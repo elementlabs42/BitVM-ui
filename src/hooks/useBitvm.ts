@@ -1,5 +1,5 @@
 import { API_URL } from '@/constants/urls'
-import { BitvmReponseStatus, Graph, GraphSimple, PegInPsbt, Signatures } from '@/types'
+import { BitvmReponseStatus, Graph, PegInGraph, PegInPsbt, Signatures } from '@/types'
 import { bitvmGet, bitvmPost } from '@/utils'
 import { useEffect, useState } from 'react'
 
@@ -30,7 +30,7 @@ export function useBitvmHistory() {
 }
 
 export function useBitvmUnusedPegInGraphs(refresh: number) {
-  const [response, setResponse] = useState<GraphSimple[]>()
+  const [response, setResponse] = useState<PegInGraph[]>()
   const [error, setError] = useState<string>()
 
   useEffect(() => {

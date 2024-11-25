@@ -1,45 +1,61 @@
 import styled from 'styled-components'
-import { ReactNode, useEffect, useState } from 'react'
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react'
 import { Label, SelectInput, TextInput, TextInputInfo, Warning } from '@/components/controls'
 import { Swap } from '@/components/icons'
 import { BTCAddressType, empty, formatBtc, parseAddressType } from '@/utils'
 import { FormPanel, Subtitle, Supplementaries, Supplementary, SwapIcon } from './styles'
 import { useBitvmUnusedPegInGraphs } from '@/hooks/useBitvm'
 import { useAccount } from 'wagmi'
-import { useBalanceOf } from '@/hooks/ethereum'
-import { EBTC_ADDRESSES } from '@/constants/addresses'
+import { useEBtcBalanceOf, EthereumTransaction, getPegOutTransaction } from '@/hooks/ethereum'
+import { EthTransactionModal } from '@/components/controls/EthTransactionModal'
+import { useRouter } from 'next/router'
 
 interface Props {
-  setFormValid: (valid: boolean) => void
+  onFormValidate: (valid: boolean) => void
+  setSubmit?: Dispatch<SetStateAction<((valid?: boolean) => void) | undefined>>
+  // setSubmitting?: (submitting: boolean) => void
 }
 
-export function PegOut({ setFormValid }: Props) {
+const OPERATOR_PUBLIC_KEYS = [
+  {
+    name: 'Operator A',
+    publickKey: '03484db4a2950d63da8455a1b705b39715e4075dd33511d0c7e3ce308c93449deb',
+  },
+]
+
+export function PegOut({ onFormValidate, setSubmit }: Props) {
+  const router = useRouter()
   const [refresh] = useState(0)
   const { response } = useBitvmUnusedPegInGraphs(refresh)
   const account = useAccount()
-  const eBtcAddress = EBTC_ADDRESSES[account.chainId ?? 0]
-  const [eBtcBalance] = useBalanceOf(eBtcAddress)
+  const [eBtcBalance] = useEBtcBalanceOf(account)
+  const [pegOut, setPegOut] = useState<EthereumTransaction>()
 
+  const [isModalOpen, setModalOpen] = useState(false)
   const [amountValid, setAmountValid] = useState(false)
   const [addressValid, setAddressValid] = useState(false)
-  const [selectValid, setSelectValid] = useState(false)
+  const [graphValid, setGraphValid] = useState(false)
+  const [operatorValid, setOperatorValid] = useState(false)
+  const [formValid, setFormValid] = useState(false)
 
   const [amountField, setAmountField] = useState('0.0')
   const [amountWarning, setAmountWarning] = useState<ReactNode>()
   const [addressField, setAddressField] = useState('')
   const [addressWarning, setAddressWarning] = useState<ReactNode>()
-  const [selectedKey, setSelectedKey] = useState<string>()
+  const [selectedGraph, setSelectedGraph] = useState<string>()
+  const [selectedOperator, setSelectedOperator] = useState<string>()
   const [received, setReceived] = useState<bigint>(0n)
 
   useEffect(() => {
-    const valid = amountValid && addressValid && !!account.address && selectValid
+    const valid = amountValid && addressValid && !!account.address && graphValid && operatorValid
+    onFormValidate(valid)
     setFormValid(valid)
-  }, [amountValid, addressValid, selectValid, account.address, setFormValid])
+  }, [amountValid, addressValid, graphValid, account.address, operatorValid, onFormValidate])
 
   const warningLabel = (text: string) => <Warning text={text} withHelp={true} />
   useEffect(() => {
-    if (response && selectedKey) {
-      const index = parseInt(selectedKey)
+    if (response && selectedGraph) {
+      const index = parseInt(selectedGraph)
       const graph = response[index]
       setAmountField(formatBtc(graph.amount))
       setReceived((BigInt(graph.amount) * 99n) / 100n)
@@ -51,7 +67,39 @@ export function PegOut({ setFormValid }: Props) {
         setAmountValid(true)
       }
     }
-  }, [selectedKey, response, eBtcBalance, setAmountField, setAmountWarning])
+  }, [selectedGraph, response, eBtcBalance, setAmountField, setAmountWarning])
+
+  useEffect(() => {
+    if (setSubmit && selectedOperator && response && selectedGraph && account.chainId) {
+      const index = parseInt(selectedGraph)
+      const graph = response[index]
+      const chainId = account.chainId
+
+      setSubmit(() => async () => {
+        const operatorIndex = parseInt(selectedOperator)
+        const operator = OPERATOR_PUBLIC_KEYS[operatorIndex]
+        if (formValid) {
+          const tx = getPegOutTransaction(chainId, {
+            functionName: 'pegOut',
+            args: [],
+            destinationBitcoinAddress: addressField,
+            amount: graph.amount,
+            outpoint: { txid: graph.sourceOutpoint.txid, vout: graph.sourceOutpoint.vout },
+            operatorPublicKey: operator.publickKey,
+          })
+          setPegOut(tx)
+          setModalOpen(true)
+        }
+      })
+    }
+  }, [formValid, account.chainId, selectedGraph, selectedOperator, addressField, response, setSubmit, setModalOpen])
+
+  const onModalClose = (success?: boolean) => {
+    setModalOpen(false)
+    if (success === true) {
+      router.push('/history')
+    }
+  }
 
   return (
     <FormPanel>
@@ -60,8 +108,8 @@ export function PegOut({ setFormValid }: Props) {
       <Supplementary>Supply eBTC to send BTC to your Bitcoin wallet</Supplementary>
       <SelectInput
         label={<Label text={'Select Peg-in graph'} withHelp={true} />}
-        validate={setSelectValid}
-        select={setSelectedKey}
+        validate={setGraphValid}
+        select={setSelectedGraph}
         placeHolder={response ? 'Select Peg-in Graph' : 'Loading ...'}
       >
         {response &&
@@ -72,6 +120,16 @@ export function PegOut({ setFormValid }: Props) {
             </Graph>
           ))}
       </SelectInput>
+      <SelectInput
+        label={<Label text={'Select Operator'} withHelp={true} />}
+        validate={setOperatorValid}
+        select={setSelectedOperator}
+        placeHolder={'Select Operator'}
+      >
+        {OPERATOR_PUBLIC_KEYS.map((operator, i) => (
+          <Operator key={i}>{operator.name}</Operator>
+        ))}
+      </SelectInput>
       {account.address ? (
         <TextInputInfo
           label={<Label text={'You Supply'} withHelp={true} />}
@@ -79,10 +137,10 @@ export function PegOut({ setFormValid }: Props) {
           warning={amountWarning}
         />
       ) : (
-        <Warning text={'Please connect a Ethereum wallet'} />
+        <Warning text={'Please connect an Ethereum wallet'} />
       )}
       <TextInput
-        label={<Label text={'Recipient address'} />}
+        label={<Label text={'Recipient bitcoin address'} />}
         warning={addressWarning}
         value={addressField}
         validate={(t) => {
@@ -100,12 +158,15 @@ export function PegOut({ setFormValid }: Props) {
         </Supplementary>
         <Supplementary>
           <span>You receive:</span>
-          <span>{empty(amountField) ? '0' : formatBtc(received)} eBTC</span>
+          <span>{empty(amountField) ? '0' : formatBtc(received)} BTC</span>
         </Supplementary>
       </Supplementaries>
+      {isModalOpen && <EthTransactionModal tx={pegOut} onClosed={onModalClose} />}
     </FormPanel>
   )
 }
+
+const Operator = styled.div``
 
 const Graph = styled.div`
   display: flex;

@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { ReactNode, useEffect, useState } from 'react'
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react'
 import { Label, SelectInput, TextInput, TextInputInfo, TextInputWithAction, Warning } from '@/components/controls'
 import { Bitcoin, Swap } from '@/components/icons'
 import { BTCConnectorType } from '@/constants/connector'
@@ -10,6 +10,8 @@ import { FormPanel, Subtitle, Supplementaries, Supplementary, SwapIcon } from '.
 
 interface Props {
   setFormValid: (valid: boolean) => void
+  setSubmit?: Dispatch<SetStateAction<((valid?: boolean) => void) | undefined>>
+  setSubmitting?: (submitting: boolean) => void
 }
 
 export function PegIn({ setFormValid }: Props) {

@@ -4,23 +4,13 @@ import { spawnSync } from 'child_process'
 import { empty, getErrorOnly } from '@/utils'
 import * as bitcoin from 'bitcoinjs-lib'
 import { isAddress } from 'viem'
-import {
-  BitvmResponseData,
-  Command,
-  Env,
-  Graph,
-  GraphSimple,
-  GraphType,
-  PegInPsbt,
-  Tx,
-  TxStatus,
-  TxType,
-} from '@/types'
+import { BitvmResponseData, Command, Env, Graph, PegInGraph, GraphType, PegInPsbt, Tx, TxStatus, TxType } from '@/types'
 import { BitvmReponseStatus, SignaturesArgs, TransactionsArgs } from '@/types'
 
 const DEFAULT_PATH = 'bitvm/'
 const DEFAULT_EXEC = 'cli-query'
 const DEFAULT_DELIMITER_TOKEN = '>>>> BitVM Query Response <<<<'
+const DUST = 10000n
 
 export class BitvmService {
   env: Env
@@ -146,11 +136,16 @@ export class BitvmService {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  private interperetUnusedPegInGraphs(graphs: any[]): GraphSimple[] {
+  private interperetUnusedPegInGraphs(graphs: any[]): PegInGraph[] {
     return graphs.map((g) => {
-      const graph: GraphSimple = {
+      const graph: PegInGraph = {
         graphId: String(g.graph_id),
-        amount: BigInt(g.amount),
+        // work-around for getting pow2 value by removing dust value from amount
+        amount: BigInt(g.amount) - DUST,
+        sourceOutpoint: {
+          txid: String(g.source_outpoint.txid),
+          vout: Number(g.source_outpoint.vout),
+        },
       }
       return graph
     })
@@ -181,6 +176,7 @@ export class BitvmService {
         amount: BigInt(g.amount),
         status: String(g.status),
         transactions: txs,
+        receipient: '', //TODO: add receipient
       }
       return graph
     })
