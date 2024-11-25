@@ -158,7 +158,7 @@ export function PegOut({ onFormValidate, setSubmit }: Props) {
         </Supplementary>
         <Supplementary>
           <span>You receive:</span>
-          <span>{empty(amountField) ? '0' : formatBtc(received)} eBTC</span>
+          <span>{empty(amountField) ? '0' : formatBtc(received)} BTC</span>
         </Supplementary>
       </Supplementaries>
       {isModalOpen && <EthTransactionModal tx={pegOut} onClosed={onModalClose} />}

@@ -16,6 +16,8 @@ export function EthTransactionModal({ onClosed, tx, className, children }: Props
   const [needApproval, setNeedApproval] = useState(false)
   const { callArgs: args, ...ethTx } = tx || {}
   const account = useAccount()
+  const { data: txApprovalHash, sendTransaction: sendApproval } = useSendTransaction()
+  const { isLoading: isApproving, isSuccess: isApproved } = useWaitForTransactionReceipt({ hash: txApprovalHash })
   const { data: txHash, sendTransaction } = useSendTransaction()
   const { isLoading, isSuccess } = useWaitForTransactionReceipt({ hash: txHash })
   const estimate = async () => {
@@ -43,21 +45,21 @@ export function EthTransactionModal({ onClosed, tx, className, children }: Props
   const approve = async () => {
     if (account.chain) {
       const { to, data } = getEbtcApprovalTransaction(account.chain.id)
-      sendTransaction({ to, data })
+      sendApproval({ to, data })
     }
   }
 
   useEffect(() => {
-    if (needApproval) {
-      if (isSuccess) {
-        setNeedApproval(false)
-      }
-    } else {
-      if (isSuccess) {
-        onClosed(true)
-      }
+    if (isSuccess) {
+      onClosed(true)
     }
-  }, [needApproval, isSuccess, onClosed])
+  }, [isSuccess, onClosed])
+
+  useEffect(() => {
+    if (needApproval && isApproved) {
+      setNeedApproval(false)
+    }
+  }, [isApproved, needApproval])
 
   return (
     <StyledModal close={onClosed} className={className}>
@@ -66,7 +68,7 @@ export function EthTransactionModal({ onClosed, tx, className, children }: Props
       <Spacer />
       {needApproval && (
         <Button onClick={approve} active={true}>
-          {isLoading ? (
+          {isApproving ? (
             <span>
               <span>APPROVING</span> <Spinner />
             </span>
@@ -76,7 +78,7 @@ export function EthTransactionModal({ onClosed, tx, className, children }: Props
         </Button>
       )}
       <Button onClick={send} active={!!tx && !needApproval}>
-        {!needApproval && isLoading ? (
+        {isLoading ? (
           <span>
             <span>SENDING</span> <Spinner />
           </span>

@@ -5,10 +5,12 @@ import {
   Address,
   Chain,
   ContractFunctionArgs,
+  createPublicClient,
   createWalletClient,
   encodeFunctionData,
   Hex,
   http,
+  parseAbiItem,
   publicActions,
 } from 'viem'
 
@@ -75,6 +77,23 @@ export async function estimateGas(account: Address, chain: Chain, arg: TxCallArg
     address: BRIDGE_ADDRESSES[chain.id],
     ...arg,
   })
+}
+
+export async function getPegOutLogs(chain: Chain) {
+  const publicClient = createPublicClient({
+    chain,
+    transport: http(),
+  })
+
+  const filter = await publicClient.createEventFilter({
+    address: BRIDGE_ADDRESSES[chain.id],
+    event: parseAbiItem([
+      'struct Outpoint {bytes32 txId;uint256 vOut;}',
+      'event PegOutInitiated(address indexed withdrawer,string destinationAddress,Outpoint sourceOutpoint,uint256 amount,bytes operatorPubkey)',
+    ]),
+  })
+
+  return await publicClient.getFilterLogs({ filter })
 }
 
 function getAbiFor(functionName: string) {

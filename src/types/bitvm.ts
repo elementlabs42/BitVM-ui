@@ -1,3 +1,5 @@
+import { Address } from 'viem'
+
 export enum Env {
   MAINNET = 'mainnet',
   TESTNET = 'testnet',
@@ -81,6 +83,7 @@ export type Graph = BaseGraph & {
   type: GraphType
   status: string
   transactions: Tx[]
+  receipient: string
 }
 
 export type PegInGraph = BaseGraph & {
@@ -90,4 +93,13 @@ export type PegInGraph = BaseGraph & {
 export type OutPoint = {
   txid: string
   vout: number
+}
+
+export type PegOutInitiated = {
+  withdrawer: Address
+  destinationAddress: string
+  sourceOutpoint: OutPoint
+  amount: bigint
+  operatorPubkey: `0x${string}`
+  block: bigint
 }

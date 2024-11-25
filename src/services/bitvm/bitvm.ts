@@ -176,6 +176,7 @@ export class BitvmService {
         amount: BigInt(g.amount),
         status: String(g.status),
         transactions: txs,
+        receipient: '', //TODO: add receipient
       }
       return graph
     })
