@@ -1,4 +1,6 @@
-export const EBTC_ABI = [
+import { Abi } from 'abitype'
+
+export const EBTC_ABI: Abi = [
   {
     type: 'constructor',
     inputs: [
@@ -430,7 +432,7 @@ export const EBTC_ABI = [
   },
 ]
 
-export const BRIDGE_ABI = [
+export const BRIDGE_ABI: Abi = [
   {
     type: 'constructor',
     inputs: [
