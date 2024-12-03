@@ -8,33 +8,14 @@ import {
 import { Refresh } from '@/components/icons'
 import { Active, CircledChecked, PegIn, PegOut } from '@/components/icons/history'
 import { Page } from '@/components/layout'
-import { useBridgePegOuts } from '@/hooks/ethereum/useBridge'
 import { useBitvmHistory } from '@/hooks/useBitvm'
-import { Graph, GraphType, TxType } from '@/types'
-import { useEffect, useState } from 'react'
+import { GraphType, TxType } from '@/types'
 import styled from 'styled-components'
 import { useAccount } from 'wagmi'
 
 export default function History() {
   const account = useAccount()
-  const { response } = useBitvmHistory()
-  const pegOutInitiatedEvents = useBridgePegOuts(account)
-  const [graphs, setGraphs] = useState<Graph[]>()
-
-  useEffect(() => {
-    //TODO: match logs with peg out graph in response
-    if (response && pegOutInitiatedEvents) {
-      const newPegOutGraphs = pegOutInitiatedEvents.map((log) => ({
-        graphId: '',
-        amount: log.amount,
-        type: GraphType.PEG_OUT,
-        status: 'Peg Out Logged, waiting for operator ...',
-        transactions: [],
-        receipient: log.destinationAddress,
-      }))
-      setGraphs([...newPegOutGraphs, ...response])
-    }
-  }, [response, pegOutInitiatedEvents])
+  const { response: graphs } = useBitvmHistory(account)
   return (
     <Page>
       <main>
@@ -47,7 +28,7 @@ export default function History() {
                   <GraphItem icon={graph.type === GraphType.PEG_IN ? <PegIn /> : <PegOut />}>
                     <span>
                       {graph.type === GraphType.PEG_IN
-                        ? `Bridge ${graph.amount} BTC to [recipient]`
+                        ? `Bridge ${graph.amount} BTC to ${graph.receipient}`
                         : `Redeem ${graph.amount} eBTC to ${graph.receipient}`}
                     </span>
                     <span>{graph.status}</span>

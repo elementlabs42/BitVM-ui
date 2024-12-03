@@ -1,5 +1,5 @@
 import { BitvmService } from '@/services/bitvm/bitvm'
-import { BitvmReponseStatus, BitvmResponse, Env } from '@/types'
+import { BitvmReponseStatus, BitvmResponse } from '@/types'
 import { validate, ValidationResult } from '@/services/validation'
 import { getErrorOnly } from '@/utils'
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -12,7 +12,7 @@ type WithdrawerArgs = {
 export default function handler(req: NextApiRequest, res: NextApiResponse<BitvmResponse | string>) {
   const validation = validate(req, validateWithDrawer)
   if (validation.status === 200 && validation.args) {
-    const bitvm = new BitvmService(Env.TESTNET)
+    const bitvm = new BitvmService(validation.env)
     const result = getWithdrawerStatus(bitvm, validation.args.address)
     res.status(result.status === 'OK' ? 200 : 500).json(result)
   } else {
@@ -20,12 +20,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<BitvmR
   }
 }
 
-function validateWithDrawer(req: NextApiRequest): ValidationResult<WithdrawerArgs> {
-  const result: ValidationResult<WithdrawerArgs> = { status: 200 }
-
+function validateWithDrawer(
+  req: NextApiRequest,
+  result: ValidationResult<WithdrawerArgs>,
+): ValidationResult<WithdrawerArgs> {
   const address = validateEthereumAddress(req)
   if (!address) {
-    return { status: 400, error: 'Invalid ethereum address' }
+    return { status: 400, error: 'Invalid ethereum address', env: result.env }
   } else {
     result.args = { ...result.args, address }
   }

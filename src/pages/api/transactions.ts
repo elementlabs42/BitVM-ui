@@ -1,5 +1,5 @@
 import { BitvmService } from '@/services/bitvm/bitvm'
-import { BitvmReponseStatus, BitvmResponse, Env, TransactionsArgs } from '@/types'
+import { BitvmReponseStatus, BitvmResponse, TransactionsArgs } from '@/types'
 import { validate, ValidationResult } from '@/services/validation'
 import { getErrorOnly } from '@/utils'
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -13,7 +13,7 @@ import {
 export default function handler(req: NextApiRequest, res: NextApiResponse<BitvmResponse | string>) {
   const validation = validate(req, validateHistory)
   if (validation.status === 200 && validation.args) {
-    const bitvm = new BitvmService(Env.TESTNET)
+    const bitvm = new BitvmService(validation.env)
     const result = getTransactions(bitvm, validation.args)
     res.status(result.status === 'OK' ? 200 : 500).json(result)
   } else {
@@ -21,33 +21,34 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<BitvmR
   }
 }
 
-function validateHistory(req: NextApiRequest): ValidationResult<TransactionsArgs> {
-  const result: ValidationResult<TransactionsArgs> = { status: 200 }
-
+function validateHistory(
+  req: NextApiRequest,
+  result: ValidationResult<TransactionsArgs>,
+): ValidationResult<TransactionsArgs> {
   const pubkey = validateBitcoinPublicKey(req)
   if (!pubkey) {
-    return { status: 400, error: 'Invalid bitcoin public key' }
+    return { status: 400, error: 'Invalid bitcoin public key', env: result.env }
   } else {
     result.args = { pubkey, address: '', outpoint: '', sat: 0n }
   }
 
   const address = validateEthereumAddress(req)
   if (!address) {
-    return { status: 400, error: 'Invalid ethereum address' }
+    return { status: 400, error: 'Invalid ethereum address', env: result.env }
   } else {
     result.args = { ...result.args, address }
   }
 
   const outpoint = validateOutpoint(req)
   if (!outpoint) {
-    return { status: 400, error: 'Invalid Outpoint' }
+    return { status: 400, error: 'Invalid Outpoint', env: result.env }
   } else {
     result.args = { ...result.args, outpoint }
   }
 
   const sat = validateSatoshis(req)
   if (!sat) {
-    return { status: 400, error: 'Invalid Satoshis' }
+    return { status: 400, error: 'Invalid Satoshis', env: result.env }
   } else {
     result.args = { ...result.args, sat }
   }

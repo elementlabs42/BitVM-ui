@@ -1,7 +1,9 @@
+import { Env } from '@/types'
 import { NextApiRequest } from 'next'
 
 export type ValidationResult<Args> = {
   status: number
+  env: Env
   error?: string
   args?: Args
 }
@@ -14,15 +16,19 @@ function validateMethods(req: NextApiRequest) {
   }
 }
 
-export function validate<Args>(req: NextApiRequest, customValidate?: (req: NextApiRequest) => ValidationResult<Args>) {
+export function validate<Args>(
+  req: NextApiRequest,
+  customValidate?: (req: NextApiRequest, result: ValidationResult<Args>) => ValidationResult<Args>,
+): ValidationResult<Args> {
   const methodResult = validateMethods(req)
   if (methodResult) {
     return methodResult as ValidationResult<Args>
   }
 
+  const env: Env = Env[process.env.BITVM_ENV as keyof typeof Env] ?? Env.LOCAL
+  const result = { status: 200, env }
   if (customValidate) {
-    return customValidate(req)
-  } else {
-    return { status: 200 }
+    return customValidate(req, result)
   }
+  return result
 }

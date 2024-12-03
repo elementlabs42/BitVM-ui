@@ -2,29 +2,33 @@ import { API_URL } from '@/constants/urls'
 import { BitvmReponseStatus, Graph, PegInGraph, PegInPsbt, Signatures } from '@/types'
 import { bitvmGet, bitvmPost } from '@/utils'
 import { useEffect, useState } from 'react'
+import { UseAccountReturnType } from 'wagmi'
 
 //TODO: add real parameters for following hooks
 
-export function useBitvmHistory() {
+export function useBitvmHistory(account: UseAccountReturnType) {
   const [publicKey] = useState<string>('02edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301b')
-  const [address] = useState<string>('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
   const [response, setResponse] = useState<Graph[]>()
   const [error, setError] = useState<string>()
 
   useEffect(() => {
     ;(async () => {
-      const { bitvmResponse, httpError } = await bitvmGet(`${API_URL}/history?pubkey=${publicKey}&address=${address}`)
-      if (httpError) {
-        // ignore http error
-      } else {
-        if (bitvmResponse.status === BitvmReponseStatus.OK) {
-          setResponse(bitvmResponse.data)
+      if (account.address) {
+        const { bitvmResponse, httpError } = await bitvmGet(
+          `${API_URL}/history?pubkey=${publicKey}&address=${account.address}`,
+        )
+        if (httpError) {
+          // ignore http error
         } else {
-          setError(bitvmResponse.error)
+          if (bitvmResponse.status === BitvmReponseStatus.OK) {
+            setResponse(bitvmResponse.data)
+          } else {
+            setError(bitvmResponse.error)
+          }
         }
       }
     })()
-  }, [publicKey, address])
+  }, [publicKey, account.address])
 
   return { response, error }
 }
