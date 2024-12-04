@@ -1,5 +1,4 @@
 import * as bitcoin from 'bitcoinjs-lib'
-import { decodePsbt } from 'bitcoinjs-lib/psbt'
 export const createPsbt = (rawTxHex: string, witnessUtxoHex: string, witnessScriptHex: string) => {
   const txDetails = bitcoin.Transaction.fromHex(rawTxHex)
 

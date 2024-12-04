@@ -4,7 +4,6 @@ import {
   Label,
   RoundedElement,
   RoundedIcon,
-  SelectInput,
   TextInput,
   TextInputInfo,
   TextInputWithAction,
@@ -197,14 +196,21 @@ export default function Bridge() {
           />
           <PeginFirstSign
             isVisible={signStep === 2}
-            amount={btcBalance ? formatBtc(BigInt(amountField)) : '0'}
+            amount={amountField ? amountField : '0'}
             destination={addressField ? formatAddress(addressField) : ''}
             onBack={() => {
               setSignStep(1)
             }}
             onConfirm={async () => {
+              const result = await fetch('/api/pegin-deposit?' + new URLSearchParams({
+                sat: parseBtc(amountField)!.toString(),
+                address: addressField,
+                pubkey: btcAddress,
+              }),
+              )
+              const data = await result.json()
               const res = await signPsbt(
-                '70736274ff01005e02000000010ae306c82a878f789780b096421b1ee1c11bf57a3b014925a80e6ff1a32ab78a0000000000ffffffff013800000000000000225120963b0923fd7a825e0333c4bf71c218a86f85504576ddb777f65d9c5a1e4587c000000000000100ea020000000001016e66e2d2e2b3c1dfc86294adf307615d48fc3715905bae26c718c198fe45d0380100000000ffffffff021029000000000000220020a1102d8c68b52d16532fa42737ebae6db487b7abbbe84cccc0328c19345ad91e7a740700000000001600147dd9efafecff9f8675c4a5a3cceef5b816241c3a0247304402201c042daaa0f8a92ef5124996d374b68439e232abf8efcf287a8b93b03bffc3f4022042d9b5163e74916a8d846299b029801f1837b445ec364290140955d8950ad8a4012102edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301b000000000105232102edf074e2780407ed6ff9e291b8617ee4b4b8d7623e85b58318666f33a422301bac0000',
+                data.data,
                 [
                   {
                     index: 0,
@@ -256,3 +262,80 @@ export default function Bridge() {
     </Page>
   )
 }
+const BackgroundPatternStyled = styled(BackgroundPattern)`
+  width: 208px;
+  position: absolute;
+  margin: 0;
+  height: 208px;
+  z-index: 0;
+  pointer-events: none;
+`
+
+const Title = styled.h1`
+  margin: 0;
+  padding: 0 1vw;
+`
+
+const SwapIcon = styled(RoundedIcon)`
+  border-radius: 40%;
+  background-color: ${({ theme }) => theme.Background};
+  box-shadow: 0px 2px 2px 2px ${({ theme }) => theme.ShadowInner};
+`
+
+const Subtitle = styled.h3`
+  margin: 0;
+`
+
+const FormPanel = styled(Panel)`
+  display: flex;
+  flex-direction: column;
+  row-gap: 1em;
+  min-height: 50vh;
+  z-index: 1;
+  background-color: ${({ theme }) => theme.BackgroundTransparent};
+`
+
+const FormPanelWithButton = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`
+
+const Account = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  column-gap: 1em;
+`
+
+const AccountAddress = styled.div``
+const AccountType = styled.div``
+const AccountAmount = styled.div`
+  color: ${({ theme }) => theme.FooterText};
+`
+
+const Buttons = styled.div`
+  margin: 1em 0;
+  display: flex;
+  flex-direction: row;
+  column-gap: 0.5em;
+  justify-content: right;
+`
+
+const Button = styled(RoundedElement)`
+  padding: 1.2em 2em;
+`
+
+const Supplementaries = styled.div`
+  display: flex;
+  flex-direction: column;
+  row-gap: 1em;
+`
+
+const Supplementary = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: 0.8em;
+  color: ${({ theme }) => theme.FooterText};
+  `
