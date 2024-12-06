@@ -41,6 +41,7 @@ export function useBitvmUnusedPegInGraphs(refresh: number) {
     ;(async () => {
       const { bitvmResponse, httpError } = await bitvmGet(`${API_URL}/pegins?t=${refresh}`)
       if (httpError) {
+        setError('Server error')
         console.error(httpError)
       } else {
         if (bitvmResponse.status === BitvmReponseStatus.OK) {
