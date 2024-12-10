@@ -26,7 +26,7 @@ const OPERATOR_PUBLIC_KEYS = [
 export function PegOut({ onFormValidate, setSubmit }: Props) {
   const router = useRouter()
   const [refresh] = useState(0)
-  const { response } = useBitvmUnusedPegInGraphs(refresh)
+  const { response, error } = useBitvmUnusedPegInGraphs(refresh)
   const account = useAccount()
   const [eBtcBalance] = useEBtcBalanceOf(account)
   const [pegOut, setPegOut] = useState<EthereumTransaction>()
@@ -110,7 +110,7 @@ export function PegOut({ onFormValidate, setSubmit }: Props) {
         label={<Label text={'Select Peg-in graph'} withHelp={true} />}
         validate={setGraphValid}
         select={setSelectedGraph}
-        placeHolder={response ? 'Select Peg-in Graph' : 'Loading ...'}
+        placeHolder={response ? 'Select Peg-in Graph' : error ? error : 'Loading ...'}
       >
         {response &&
           response.map((graph, i) => (

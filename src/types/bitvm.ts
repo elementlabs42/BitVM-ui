@@ -3,6 +3,7 @@ import { Address } from 'viem'
 export enum Env {
   MAINNET = 'mainnet',
   TESTNET = 'testnet',
+  LOCAL = 'local',
 }
 
 export enum Command {

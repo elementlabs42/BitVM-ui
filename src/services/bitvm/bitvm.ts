@@ -10,7 +10,6 @@ import { BitvmReponseStatus, SignaturesArgs, TransactionsArgs } from '@/types'
 const DEFAULT_PATH = 'bitvm/'
 const DEFAULT_EXEC = 'cli-query'
 const DEFAULT_DELIMITER_TOKEN = '>>>> BitVM Query Response <<<<'
-const DUST = 10000n
 
 export class BitvmService {
   env: Env
@@ -140,8 +139,7 @@ export class BitvmService {
     return graphs.map((g) => {
       const graph: PegInGraph = {
         graphId: String(g.graph_id),
-        // work-around for getting pow2 value by removing dust value from amount
-        amount: BigInt(g.amount) - DUST,
+        amount: BigInt(g.amount),
         sourceOutpoint: {
           txid: String(g.source_outpoint.txid),
           vout: Number(g.source_outpoint.vout),
@@ -176,7 +174,7 @@ export class BitvmService {
         amount: BigInt(g.amount),
         status: String(g.status),
         transactions: txs,
-        receipient: '', //TODO: add receipient
+        receipient: String(g.destination_address),
       }
       return graph
     })

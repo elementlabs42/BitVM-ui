@@ -1,5 +1,5 @@
 import { BitvmService } from '@/services/bitvm/bitvm'
-import { BitvmReponseStatus, BitvmResponse, Env } from '@/types'
+import { BitvmReponseStatus, BitvmResponse } from '@/types'
 import { validate } from '@/services/validation'
 import { getErrorOnly } from '@/utils'
 import type { NextApiRequest, NextApiResponse } from 'next'
@@ -7,7 +7,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 export default function handler(req: NextApiRequest, res: NextApiResponse<BitvmResponse | string>) {
   const validation = validate(req)
   if (validation.status === 200) {
-    const bitvm = new BitvmService(Env.TESTNET)
+    const bitvm = new BitvmService(validation.env)
     const result = getUnusedPegInGraphs(bitvm)
     res.status(result.status === 'OK' ? 200 : 500).json(result)
   } else {
