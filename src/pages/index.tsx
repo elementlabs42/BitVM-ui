@@ -14,6 +14,7 @@ export default function Home() {
   const [page, setPage] = useHomeRoutes()
   const { selectedProvider } = useBtcConnector()
   const { openConnectModal } = useConnectModal()
+
   const account = useEthereumAccount()
   const { setDirection } = useBridgeDirection()
 

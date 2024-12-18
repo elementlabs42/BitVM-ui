@@ -26,6 +26,19 @@ export const useUnisatConnection = () => {
     accounts: [],
   })
 
+  const signPsbt = async (psbtHex: string, signInputs: { index: number; address: string }[]) => {
+    const psbtResult = await (window as any).unisat.signPsbt(psbtHex, {
+      autoFinalized: true,
+      toSignInputs: signInputs,
+    })
+    return psbtResult
+  }
+
+  const pushPsbt = async (psbtHex: string) => {
+    const psbtResult = await (window as any).unisat.pushPsbt(psbtHex)
+    return psbtResult
+  }
+
   useEffect(() => {
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const instance = (window as any).unisat
@@ -120,11 +133,11 @@ export const useUnisatConnection = () => {
 
   const connect = useCallback(async () => {
     const checkUnisat = async () => {
-      // let unisat = (window as any).unisat
-      // for (let i = 1; i < 10 && !unisat; i += 1) {
-      //   await new Promise((resolve) => setTimeout(resolve, 100 * i))
-      //   unisat = (window as any).unisat
-      // }
+      let unisat = (window as any).unisat
+      for (let i = 1; i < 10 && !unisat; i += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 100 * i))
+        unisat = (window as any).unisat
+      }
 
       if (unisat) {
         setUnisatInstalled(true)
@@ -179,5 +192,7 @@ export const useUnisatConnection = () => {
     chainType,
     setNetwork,
     setChainType,
+    signPsbt,
+    pushPsbt,
   }
 }

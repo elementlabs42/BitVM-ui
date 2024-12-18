@@ -8,7 +8,9 @@ type BtcConnectorData = {
   selectedProvider: BTCConnectorType
   isConnected: boolean
   btcAddress: string
+  pubkey: string
   btcBalance: bigint
+  signPsbt: (psbt: string, signInputs: { index: number; address: string }[]) => Promise<string>
   connectLedger: () => void
   connectTrezor: () => void
   connectUnisat: () => void
@@ -18,10 +20,12 @@ const DEFAULT: BtcConnectorData = {
   selectedProvider: BTCConnectorType.NONE,
   isConnected: false,
   btcAddress: '',
+  pubkey: '',
   btcBalance: 0n,
-  connectLedger: () => {},
-  connectTrezor: () => {},
-  connectUnisat: () => {},
+  signPsbt: async () => '',
+  connectLedger: () => { },
+  connectTrezor: () => { },
+  connectUnisat: () => { },
 }
 
 const BtcConnectorContext = createContext<BtcConnectorData>(DEFAULT)
@@ -38,6 +42,7 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
 
   const [btcAddress, setBTCAddress] = useState<string>('')
   const [btcBalance, setBTCBalance] = useState<bigint>(0n)
+  const [pubkey, setPubkey] = useState<string>('')
   const isConnected = useMemo<boolean>(() => {
     if (isClient && selectedProvider === BTCConnectorType.UNISAT) {
       return unisatConnection.unisatConnected
@@ -83,6 +88,15 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
     }
   }
 
+  const signPsbt = useCallback(
+    async (psbt: string, signInputs: { index: number; address: string }[]) => {
+      if (selectedProvider === BTCConnectorType.UNISAT) {
+        return unisatConnection.signPsbt(psbt, signInputs)
+      }
+    },
+    [unisatConnection],
+  )
+
   const getBalance = useCallback(async () => {
     if (selectedProvider === BTCConnectorType.UNISAT) {
       return BigInt(unisatConnection.balance.total)
@@ -102,6 +116,12 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
       return ledgerConnection.address
     }
   }, [selectedProvider, unisatConnection, trezorConnection, ledgerConnection])
+
+  const getPubkey = useCallback(async () => {
+    if (selectedProvider === BTCConnectorType.UNISAT) {
+      return unisatConnection.publicKey
+    }
+  }, [selectedProvider, unisatConnection])
 
   useEffect(() => {
     if (isClient) {
@@ -123,17 +143,28 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
   ])
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       if (isConnected) {
         setBTCAddress((await getAddress()) ?? '')
         setBTCBalance((await getBalance()) ?? 0n)
+        setPubkey((await getPubkey()) ?? '')
       }
     })()
-  }, [isConnected, getAddress, getBalance])
+  }, [isConnected, getAddress, getBalance, getPubkey])
 
   return (
     <BtcConnectorContext.Provider
-      value={{ selectedProvider, btcAddress, btcBalance, isConnected, connectUnisat, connectTrezor, connectLedger }}
+      value={{
+        selectedProvider,
+        btcAddress,
+        pubkey,
+        btcBalance,
+        isConnected,
+        signPsbt,
+        connectUnisat,
+        connectTrezor,
+        connectLedger,
+      }}
     >
       {children}
     </BtcConnectorContext.Provider>

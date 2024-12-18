@@ -23,6 +23,13 @@ export class BitvmService {
     this.validateClient()
   }
 
+  getDepositPeginTx(publicKey: string, amount: bigint, recipient: string) {
+    if (!isAddress(recipient)) {
+      throw new Error('Invalid ethereum address')
+    }
+    return this.call(Command.DEPOSITOR, [publicKey, Command.DEPOSIT_PEGIN_TX, amount.toString(), recipient])
+  }
+
   getHistory(publicKey: string, address: string) {
     if (!BitvmService.validateBitcoinPublicKey(publicKey)) {
       throw new Error('Invalid bitcoin public key')
@@ -95,6 +102,9 @@ export class BitvmService {
     const exec = `${this.path}${this.exec}`
     const options = `-e ${this.env} -p ${this.path}`.split(' ')
     const output = spawnSync(exec, [...options, subCommand, ...args], { cwd: this.path, stdio: [null, 'pipe', 'pipe'] })
+    if (output.stderr.length != 0 && output.stdout.length == 0) {
+      throw new Error(output.stderr.toString())
+    }
     return this.prepareResponse(subCommand, output.stdout.toString())
   }
 
@@ -112,6 +122,8 @@ export class BitvmService {
         switch (subCommand) {
           case Command.TRANSACTIONS:
             return this.interperetTransactions(obj.data)
+          case Command.DEPOSITOR:
+            return obj.data
           case Command.SIGNATURES:
             return ''
           case Command.PEGINS:
@@ -154,19 +166,19 @@ export class BitvmService {
     return graphs.map((g) => {
       const txs: Tx[] = Array.isArray(g.txs)
         ? g.txs.map((t: any) => {
-            const txStatus: TxStatus = {
-              confirmed: Boolean(t.status.confirmed),
-              blockHeight: Number(t.status.block_height),
-              blockHash: String(t.status.block_hash),
-              blockTime: Number(t.status.block_time),
-            }
-            const tx: Tx = {
-              type: Object.values(TxType).find((type) => type.toString() === t.type.toLowerCase()) ?? TxType.UNKNOWN,
-              txId: String(t.txid),
-              status: txStatus,
-            }
-            return tx
-          })
+          const txStatus: TxStatus = {
+            confirmed: Boolean(t.status.confirmed),
+            blockHeight: Number(t.status.block_height),
+            blockHash: String(t.status.block_hash),
+            blockTime: Number(t.status.block_time),
+          }
+          const tx: Tx = {
+            type: Object.values(TxType).find((type) => type.toString() === t.type.toLowerCase()) ?? TxType.UNKNOWN,
+            txId: String(t.txid),
+            status: txStatus,
+          }
+          return tx
+        })
         : []
       const graph: Graph = {
         type: Object.values(GraphType).find((type) => type.toString() === g.type.toLowerCase()) ?? GraphType.UNKNOWN,

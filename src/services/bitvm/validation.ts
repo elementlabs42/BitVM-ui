@@ -13,6 +13,16 @@ export function validateBitcoinPublicKey(req: NextApiRequest): string | undefine
   }
 }
 
+export function validateBitcoinDepositAmount(req: NextApiRequest): bigint | undefined {
+  if (req.query.sat && typeof req.query.sat === 'string') {
+    try {
+      return BigInt(req.query.sat)
+    } catch {
+      // do nothing
+    }
+  }
+}
+
 export function validateEthereumAddress(req: NextApiRequest): string | undefined {
   if (req.query.address && typeof req.query.address === 'string' && isAddress(req.query.address)) {
     return req.query.address

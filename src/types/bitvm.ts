@@ -13,6 +13,7 @@ export enum Command {
   TRANSACTIONS = 'transactions',
   SIGNATURES = 'signatures',
   PEGINS = 'pegins',
+  DEPOSIT_PEGIN_TX = 'pegin_deposit_tx',
 }
 
 export type TransactionsArgs = {
