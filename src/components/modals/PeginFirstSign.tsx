@@ -46,8 +46,6 @@ export const PeginFirstSign = ({ isVisible, amount, destination, onBack, onConfi
           <NextButton>
             <ButtonText
               onClick={() => {
-                alert('--')
-
                 onConfirm()
               }}
             >

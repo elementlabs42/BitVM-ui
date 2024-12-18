@@ -38,7 +38,7 @@ export class BitvmService {
     if (!isAddress(recipient)) {
       throw new Error('Invalid ethereum address')
     }
-    return this.call(Command.DEPOSITOR, [Command.DEPOSIT_PEGIN_TX, publicKey, amount.toString(), recipient])
+    return this.call(Command.DEPOSITOR, [publicKey, Command.DEPOSIT_PEGIN_TX, amount.toString(), recipient])
   }
 
   getHistory(publicKey: string, address: string) {
@@ -112,8 +112,10 @@ export class BitvmService {
   private call(subCommand: Command, args: string[]): BitvmResponseData {
     const exec = `${this.path}${this.exec}`
     const options = `-e ${this.env} -p ${this.path}`.split(' ')
-    console.log(exec, [...options, subCommand, ...args])
     const output = spawnSync(exec, [...options, subCommand, ...args], { cwd: this.path, stdio: [null, 'pipe', 'pipe'] })
+    if (output.stderr.length != 0 && output.stdout.length == 0) {
+      throw new Error(output.stderr.toString())
+    }
     return this.prepareResponse(subCommand, output.stdout.toString())
   }
 
@@ -131,6 +133,8 @@ export class BitvmService {
         switch (subCommand) {
           case Command.TRANSACTIONS:
             return this.interperetTransactions(obj.data)
+          case Command.DEPOSITOR:
+            return obj.data
           case Command.SIGNATURES:
             return ''
           case Command.PEGINS:

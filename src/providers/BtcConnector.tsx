@@ -8,6 +8,7 @@ type BtcConnectorData = {
   selectedProvider: BTCConnectorType
   isConnected: boolean
   btcAddress: string
+  pubkey: string
   btcBalance: bigint
   signPsbt: (psbt: string, signInputs: { index: number; address: string }[]) => Promise<string>
   connectLedger: () => void
@@ -19,11 +20,12 @@ const DEFAULT: BtcConnectorData = {
   selectedProvider: BTCConnectorType.NONE,
   isConnected: false,
   btcAddress: '',
+  pubkey: '',
   btcBalance: 0n,
   signPsbt: async () => '',
-  connectLedger: () => {},
-  connectTrezor: () => {},
-  connectUnisat: () => {},
+  connectLedger: () => { },
+  connectTrezor: () => { },
+  connectUnisat: () => { },
 }
 
 const BtcConnectorContext = createContext<BtcConnectorData>(DEFAULT)
@@ -40,6 +42,7 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
 
   const [btcAddress, setBTCAddress] = useState<string>('')
   const [btcBalance, setBTCBalance] = useState<bigint>(0n)
+  const [pubkey, setPubkey] = useState<string>('')
   const isConnected = useMemo<boolean>(() => {
     if (isClient && selectedProvider === BTCConnectorType.UNISAT) {
       return unisatConnection.unisatConnected
@@ -114,6 +117,12 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
     }
   }, [selectedProvider, unisatConnection, trezorConnection, ledgerConnection])
 
+  const getPubkey = useCallback(async () => {
+    if (selectedProvider === BTCConnectorType.UNISAT) {
+      return unisatConnection.publicKey
+    }
+  }, [selectedProvider, unisatConnection])
+
   useEffect(() => {
     if (isClient) {
       if (
@@ -134,19 +143,21 @@ export function BtcConnectorProvider({ children }: { children: React.ReactNode }
   ])
 
   useEffect(() => {
-    ;(async () => {
+    ; (async () => {
       if (isConnected) {
         setBTCAddress((await getAddress()) ?? '')
         setBTCBalance((await getBalance()) ?? 0n)
+        setPubkey((await getPubkey()) ?? '')
       }
     })()
-  }, [isConnected, getAddress, getBalance])
+  }, [isConnected, getAddress, getBalance, getPubkey])
 
   return (
     <BtcConnectorContext.Provider
       value={{
         selectedProvider,
         btcAddress,
+        pubkey,
         btcBalance,
         isConnected,
         signPsbt,

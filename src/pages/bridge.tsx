@@ -28,8 +28,9 @@ export default function Bridge() {
   const [amountValid, setAmountValid] = useState(false)
   const [addressValid, setAddressValid] = useState(false)
   const [selectValid, setSelectValid] = useState(false)
-  const { selectedProvider, isConnected, btcAddress, btcBalance, signPsbt } = useBtcConnector()
+  const { selectedProvider, isConnected, btcAddress, pubkey, btcBalance, signPsbt } = useBtcConnector()
   const [addressType, setAddressType] = useState('')
+  console.log('pubkey', pubkey)
 
   const [amountField, setAmountField] = useState('')
   const [amountWarning, setAmountWarning] = useState<ReactNode>()
