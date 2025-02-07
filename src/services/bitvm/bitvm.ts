@@ -8,7 +8,7 @@ import { BitvmResponseData, Command, Env, Graph, PegInGraph, GraphType, PegInPsb
 import { BitvmReponseStatus, SignaturesArgs, TransactionsArgs } from '@/types'
 
 const DEFAULT_PATH = 'bitvm/'
-const DEFAULT_EXEC = 'cli-query'
+const DEFAULT_EXEC = 'bridge-query'
 const DEFAULT_DELIMITER_TOKEN = '>>>> BitVM Query Response <<<<'
 
 export class BitvmService {
